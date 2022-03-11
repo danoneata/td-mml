@@ -274,9 +274,10 @@ def main():
         logger.info("  Batch size = %d", args.train_batch_size)
         logger.info("  Num steps = %d", num_train_optimization_steps)
 
+    model.train()
+
     # Train
     for epoch_id in range(start_epoch, int(args.num_train_epochs)):
-        model.train()
         for step, batch in enumerate(train_dataset):
             iter_id = start_iter_id + step + (epoch_id * len(train_dataset))
             batch = tuple(t.cuda(device=device, non_blocking=True) for t in batch[:-1])
@@ -329,37 +330,6 @@ def main():
             if (step % (20 * args.grad_acc_steps) == 0) and step != 0 and default_gpu:
                 tb_logger.showLossTrainCC()
 
-        # Do the evaluation
-        torch.set_grad_enabled(False)
-        numBatches = len(valid_dataset)
-        model.eval()
-        for step, batch in enumerate(valid_dataset):
-            batch = tuple(t.cuda(device=device, non_blocking=True) for t in batch[:-1])
-
-            input_ids, input_mask, segment_ids, lm_label_ids, is_match, \
-            image_feat, image_loc, image_cls, obj_labels, obj_confs, \
-            attr_labels, attr_confs, image_attrs, image_label, image_mask = batch
-
-            batch_size = input_ids.size(0)
-            masked_loss_t, masked_loss_v, pair_match_loss = model(input_ids, image_feat, image_loc, segment_ids,
-                                                                  input_mask, image_mask, lm_label_ids, image_label,
-                                                                  image_cls, obj_labels, obj_confs, attr_labels,
-                                                                  attr_confs, image_attrs, is_match)
-
-            loss = masked_loss_t + masked_loss_v + pair_match_loss
-            if n_gpu > 1:
-                loss = loss.mean()
-                masked_loss_t = masked_loss_t.mean()
-                masked_loss_v = masked_loss_v.mean()
-                pair_match_loss = pair_match_loss.mean()
-
-            if default_gpu:
-                tb_logger.step_val_CC(epoch_id, float(masked_loss_t), float(masked_loss_v), float(pair_match_loss),
-                                      "TASK0", batch_size, "val")
-                sys.stdout.write("%d / %d \r" % (step, numBatches))
-                sys.stdout.flush()
-
-        torch.set_grad_enabled(True)
         save(save_path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_logger, default_gpu)
 
     if default_gpu:
