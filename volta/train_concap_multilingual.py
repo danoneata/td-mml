@@ -153,7 +153,7 @@ def main():
             print("\n", file=f)
             print(config, file=f)
 
-    cache = 16
+    cache = 5000
     args.train_batch_size = args.train_batch_size // args.grad_acc_steps
     if dist.is_available() and args.local_rank != -1:
         num_replicas = dist.get_world_size()
@@ -170,20 +170,17 @@ def main():
 
     # Datasets
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
-    # train_dataset = ConceptCapMultilingualLoaderTrain(
-    #     args.annotations_path, args.features_path, tokenizer, args.bert_model,
-    #     seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size,
-    #     num_workers=args.num_workers, local_rank=args.local_rank,
-    #     objective=args.objective, cache=cache,
-    #     add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
+    train_dataset = ConceptCapMultilingualLoaderTrain(
+        args.annotations_path, args.features_path, tokenizer, args.bert_model,
+        seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size,
+        num_workers=args.num_workers, local_rank=args.local_rank,
+        objective=args.objective, cache=cache,
+        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
     valid_dataset = ConceptCapMultilingualLoaderVal(
         args.annotations_path, args.features_path, tokenizer, args.bert_model,
         seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size, num_workers=2,
         objective=args.objective, add_global_imgfeat=config.add_global_imgfeat,
         num_locs=config.num_locs)
-
-    for b in valid_dataset:
-        import pdb; pdb.set_trace()
 
     # Task details
     task_names = ["Conceptual_Caption"]
