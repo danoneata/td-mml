@@ -5,6 +5,10 @@
 # LICENSE file in the root directory of this source tree.
 
 from .concept_cap_dataset import ConceptCapLoaderTrain, ConceptCapLoaderVal
+from .concept_cap_multilingual_dataset import (
+    ConceptCapMultilingualLoaderTrain,
+    ConceptCapMultilingualLoaderVal,
+)
 # from .vqa_dataset import VQAClassificationDataset
 from .nlvr2_dataset import NLVR2Dataset, NLVR2Loader
 # from .refer_expression_dataset import ReferExpressionDataset

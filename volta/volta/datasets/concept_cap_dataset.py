@@ -471,7 +471,7 @@ class BertPreprocessBatch(object):
             image_location[:, 4] = image_location[:, 2] - image_location[:, 0]
             image_location[:, 5] = image_location[:, 3] - image_location[:, 1]
 
-        caption, label = self.random_cap(caption)
+        caption, label = self.random_cap(caption, image_id=image_id)
         if self.tokenizer_name == "bert-base-uncased":
             tokens_caption = self.tokenizer.encode(caption)
         else:
@@ -516,14 +516,8 @@ class BertPreprocessBatch(object):
         )
         return cur_tensors
 
-    def random_cap(self, caption):
-        """
-        Get one sample from corpus consisting of two sentences. With prob. 50% these are two subsequent sentences
-        from one doc. With 50% the second sentence will be a random one from another doc.
-        :param index: int, index of sample.
-        :return: (str, str, int), sentence 1, sentence 2, isNextSentence Label
-        """
-
+    def random_cap(self, caption, **kwargs):
+        """Replaces the current caption with probabilty 50%."""
         if self.visualization:
             return caption, 0
 
