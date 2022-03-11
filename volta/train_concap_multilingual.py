@@ -63,6 +63,8 @@ def parse_args():
                         help="The output directory where the model checkpoints will be written.")
     parser.add_argument("--logdir", default="logs", type=str,
                         help="The logging directory where the training logs will be written.")
+    parser.add_argument("--save_every_n_steps", default=10_000, type=int,
+                        help="Save the model every given number of steps")
     # Text
     parser.add_argument("--max_seq_length", default=36, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. \n"
@@ -330,7 +332,18 @@ def main():
             if (step % (20 * args.grad_acc_steps) == 0) and step != 0 and default_gpu:
                 tb_logger.showLossTrainCC()
 
-        save(save_path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_logger, default_gpu)
+            if global_step > 0 and global_step % args.save_every_n_steps == 0:
+                save(
+                    save_path,
+                    logger,
+                    epoch_id,
+                    model,
+                    optimizer,
+                    scheduler,
+                    global_step,
+                    tb_logger,
+                    default_gpu,
+                )
 
     if default_gpu:
         tb_logger.txt_close()

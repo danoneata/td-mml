@@ -351,7 +351,7 @@ def save(path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_lo
         # Save a trained model
         logger.info("** ** * Saving model * ** ** ")
         model_to_save = model.module if hasattr(model, "module") else model  # Only save the model it-self
-        output_model_file = os.path.join(path, "pytorch_model_" + str(epoch_id) + ".bin")
+        output_model_file = os.path.join(path, "pytorch_model_" + str(global_step) + ".bin")
         torch.save(model_to_save.state_dict(), output_model_file)
         if is_best:
             output_model_file = os.path.join(path, "pytorch_model_best.bin")
