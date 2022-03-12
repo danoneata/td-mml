@@ -76,3 +76,16 @@ conceptual_captions/
  |-- Validation_GCC-1.1.0-Validation.tsv
 
 ```
+
+## Translate Captions
+Translate the English CC captions into a target language using the M2M-100 translation model:
+```bash
+python translate_cc.py -s train -m m2m-100-md -l ro
+```
+- For the `train` split, the script translates only a subset of the captions (proportional to the amount of data used for training the XML-R model; as specified by `data/xmlr-counts.csv`)
+- For the `valid` split, the script translates the entire validation data
+
+Translate the entire English CC captions:
+```bash
+python translate_cc_full.py -s train -m m2m-100-md -l ro
+```
