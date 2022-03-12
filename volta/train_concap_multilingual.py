@@ -196,21 +196,15 @@ def main():
 
     # Model
     if args.from_pretrained:
-        type_vocab_size = config.type_vocab_size
-        config.type_vocab_size = 2
         model = BertForVLPreTraining.from_pretrained(args.from_pretrained, config=config,
                                                      default_gpu=default_gpu, from_hf=True)
-        # Resize type embeddings
-        model.bert.embeddings.token_type_embeddings = \
-            model._get_resized_embeddings(model.bert.embeddings.token_type_embeddings, type_vocab_size)
-        config.type_vocab_size = type_vocab_size
     else:
         model = BertForVLPreTraining(config)
 
     # Optimization details
     freeze_layers(model)
     no_decay = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
-    bert_weight_name = json.load(open("config/" + args.from_pretrained + "_weight_name.json", "r"))
+    bert_weight_name = json.load(open("config/" + "bert-base-uncased" + "_weight_name.json", "r"))
     if not args.from_pretrained:
         param_optimizer = list(model.named_parameters())
         optimizer_grouped_parameters = [
