@@ -39,7 +39,7 @@ def main(split, language, model_type, device="cuda", verbose=False):
         sys.exit(1)
 
     data = load_data(split, folder_input)
-    # model = load_model(model_type, device)
+    model = load_model(model_type, device)
 
     if model_type == "m2m-100-sm":
         if socket.gethostname() == "tesla":
@@ -54,8 +54,8 @@ def main(split, language, model_type, device="cuda", verbose=False):
 
     path_cache = os.path.join(PATH_DATA, folder_input, ".cache", f"{language}-{split}")
     with shelve.open(path_cache) as data_cached:
-        # data_tr = translate(data, model, language, batch_size, data_cached, verbose=verbose)
-        data_tr = {k: v for k, v in tqdm.tqdm(data_cached.items())}
+        data_tr = translate(data, model, language, batch_size, data_cached, verbose=verbose)
+        # data_tr = {k: v for k, v in tqdm.tqdm(data_cached.items())}
         save_data(data_tr, split, language, folder_output)
 
 
