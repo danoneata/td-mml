@@ -49,6 +49,8 @@ def parse_args():
                         help="The corpus image features directory.")
     parser.add_argument("--langs", type=str, default=LANGS, nargs="+", choices=LANGS,
                         help="Languages loaded from the annotations path (lg1 lg2 lg3 .. ex: en fr es de). By default, use all languages.")
+    parser.add_argument("--langs_sampling_path", type=str,
+                        help="Path to file containing language and sample probabilities. If not provided, given a sample pick uniiformly a random language for which we have translation.")
     # Model
     parser.add_argument("--from_pretrained", default="bert-base-uncased", type=str,
                         help="Bert pre-trained model selected in the list: bert-base-uncased, roberta-base, ...")
@@ -172,7 +174,8 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
     train_dataset = ConceptCapMultilingualLoaderTrain(
         args.annotations_path, args.features_path, tokenizer, args.bert_model,
-        seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size,
+        seq_len=args.max_seq_length, langs=args.langs,
+        langs_sampling_path=args.langs_sampling_path, batch_size=args.train_batch_size,
         num_workers=args.num_workers, local_rank=args.local_rank,
         objective=args.objective, tokenizer_name=args.bert_model, cache=cache,
         add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)

@@ -11,6 +11,7 @@ import logging
 
 import tensorpack.dataflow as td
 
+import numpy as np
 import torch.distributed as dist
 
 from volta.datasets.concept_cap_dataset import (
@@ -59,6 +60,7 @@ class ConceptCapMultilingualLoaderTrain(ConceptCapLoaderTrain):
         bert_model,
         seq_len,
         langs,
+        langs_sampling_path=None,
         batch_size=512,
         num_workers=25,
         cache=10000,
@@ -89,6 +91,7 @@ class ConceptCapMultilingualLoaderTrain(ConceptCapLoaderTrain):
             36,
             self.num_dataset,
             langs=langs,
+            langs_sampling_path=langs_sampling_path,
             objective=objective,
             num_locs=num_locs,
             tokenizer_name=tokenizer_name,
@@ -138,6 +141,7 @@ class ConceptCapMultilingualLoaderVal(ConceptCapLoaderVal):
             bert_model,
             seq_len,
             langs,
+            langs_sampling_path=None,
             batch_size=512,
             num_workers=25,
             cache=5000,
@@ -160,6 +164,7 @@ class ConceptCapMultilingualLoaderVal(ConceptCapLoaderVal):
             36,
             self.num_dataset,
             langs=langs,
+            langs_sampling_path=langs_sampling_path,
             visualization=visualization,
             objective=objective,
             num_locs=num_locs,
@@ -187,6 +192,7 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
             region_len,
             data_size,
             langs,
+            langs_sampling_path=None,
             split="Train",
             visualization=False,
             objective=0,
@@ -206,6 +212,15 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         self.bert_model = bert_model
         self.num_locs = num_locs
         self.tokenizer_name = tokenizer_name
+        self.sample_language = self.prepare_langauge_sampler(langs_sampling_path)
+
+    def prepare_langauge_sampler(self, path):
+        if path is None:
+            return LanguageSamplingDefault(self.captions)
+        elif os.path.exists(path):
+            return LanguageSamplingGiven(self.captions, path)
+        else:
+            assert False, "path should be `None` or exist:\n{}".format(path)
 
     @staticmethod
     def load_captions(path, split, langs):
@@ -223,12 +238,54 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         else:
             # Pick the correpsonding caption of the current image from a random
             # language for which we have the translation.
-            langs_translated = [
-                lang
-                for lang, captions_lang in self.captions.items()
-                if image_id in captions_lang
-            ]
-            lang = random.choice(langs_translated)
+            lang = self.sample_language(image_id)
             caption = self.captions[lang][image_id]
             label = 0
         return caption, label
+
+
+# Functions used for language sampling
+
+class LanguageSamplingDefault:
+    """Uniformly picks one of the languages for which we have a translation."""
+    def __init__(self, captions):
+        self.captions = captions
+
+    def __call__(self, image_id):
+        langs_translated = [
+            lang
+            for lang, captions_lang in self.captions.items()
+            if image_id in captions_lang
+        ]
+        return random.choice(langs_translated)
+
+
+class LanguageSamplingGiven:
+    """Picks a language based on the probabilities specified at the given path.
+    This function is used to replicate the adjusted langauge probabilities of
+    Conneau and Lample, but using our sampling procedure which first samples
+    the ids and then the languages. See the following notebook for more
+    details:
+
+    https://colab.research.google.com/drive/1bH3vyF6YhniM7XVXyIHoiDpHN57Kth1O
+
+    """
+    def __init__(self, captions, path):
+        data = np.load(path)
+        p_lang_and_sent = data["p_lang_and_sent"]
+        langs = data["langs"]
+        sents = data["sents"]
+        # compute p(lang | sent)
+        p_sent = p_lang_and_sent.sum(axis=0, keepdims=True)
+        p_lang_given_sent = p_lang_and_sent / p_sent
+        # data needed by `__call__`
+        self.captions = captions
+        self.langs = langs
+        self.p_lang_given_sent = {
+            sent: p_lang_given_sent[:, i]
+            for i, sent in enumerate(sents)
+        }
+
+    def __call__(self, image_id):
+        p = self.p_lang_given_sent[image_id]
+        return random.choices(self.langs, weights=p)[0]

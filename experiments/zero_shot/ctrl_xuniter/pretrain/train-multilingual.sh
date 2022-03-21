@@ -2,6 +2,7 @@
 
 ANNOS=/home/doneata/work/tt-mml/data/cc/translations/m2m-100-md-seed-1337
 FEATS=/mnt/private-share/speechDatabases/conceptual-captions/resnet101-faster-rcnn-genome-imgfeats/volta
+LANG_SAMPLING=/home/doneata/work/tt-mml/data/cc/translations/p-lang-and-sent-alpha-0.3.npz
 OUTPUT_DIR=output
 LOGGING_DIR=logs
 
@@ -18,5 +19,6 @@ python train_concap_multilingual.py \
   --features_path $FEATS \
   --output_dir $OUTPUT_DIR \
   --logdir $LOGGING_DIR \
-  --num_train_epochs 10
+  --num_train_epochs 10 \
+  --langs_sampling_path $LANG_SAMPLING
   # --num_workers 0  # For debugging purposes
