@@ -88,7 +88,9 @@ def parse_args():
                         help="whether use chunck for parallel training.")
     parser.add_argument("--use_chunk", default=0, type=float,
                         help="whether use chunck for parallel training.")
-
+    #add for retireval_dataset_multilingual
+    parser.add_argument("--id2key_dir", default="", type=str,
+                        help="whether use chunck for parallel training.")
     return parser.parse_args()
 
 
@@ -127,7 +129,8 @@ def main():
 
     # Output dirs
     if "/" in args.from_pretrained:
-        timeStamp = args.from_pretrained.split("/")[1]
+        # timeStamp = args.from_pretrained.split("/")[1]
+        timeStamp = args.from_pretrained.split("/")[-1].split('.')[0]
     else:
         timeStamp = args.from_pretrained
     savePath = os.path.join(args.output_dir, timeStamp)
@@ -153,7 +156,8 @@ def main():
             model = BertForVLTasks.from_pretrained(args.from_pretrained, config=config, task_cfg=task_cfg, task_ids=[task])
 
     # Move to GPU(s)
-    model.to(device)
+    # model.to(device)
+    model.cuda()
     if args.local_rank != -1:
         try:
             from apex.parallel import DistributedDataParallel as DDP
@@ -164,7 +168,7 @@ def main():
         model = DDP(model, deay_allreduce=True)
     elif n_gpu > 1:
         model = nn.DataParallel(model)
-        raise ValueError("Please run with a single GPU")
+        # raise ValueError("Please run with a single GPU")
 
     # Print summary
     if default_gpu:
