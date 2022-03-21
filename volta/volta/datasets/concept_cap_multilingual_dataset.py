@@ -218,7 +218,7 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         if path is None:
             return LanguageSamplingDefault(self.captions)
         elif os.path.exists(path):
-            return LanguageSamplingGiven(self.captions, path)
+            return LanguageSamplingGiven(path)
         else:
             assert False, "path should be `None` or exist:\n{}".format(path)
 
@@ -270,7 +270,7 @@ class LanguageSamplingGiven:
     https://colab.research.google.com/drive/1bH3vyF6YhniM7XVXyIHoiDpHN57Kth1O
 
     """
-    def __init__(self, captions, path):
+    def __init__(self, path):
         data = np.load(path)
         p_lang_and_sent = data["p_lang_and_sent"]
         langs = data["langs"]
@@ -279,7 +279,6 @@ class LanguageSamplingGiven:
         p_sent = p_lang_and_sent.sum(axis=0, keepdims=True)
         p_lang_given_sent = p_lang_and_sent / p_sent
         # data needed by `__call__`
-        self.captions = captions
         self.langs = langs
         self.p_lang_given_sent = {
             sent: p_lang_given_sent[:, i]
