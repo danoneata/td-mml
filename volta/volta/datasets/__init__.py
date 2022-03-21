@@ -5,10 +5,8 @@
 # LICENSE file in the root directory of this source tree.
 
 from .concept_cap_dataset import ConceptCapLoaderTrain, ConceptCapLoaderVal
-from .concept_cap_multilingual_dataset import (
-    ConceptCapMultilingualLoaderTrain,
-    ConceptCapMultilingualLoaderVal,
-)
+from .concept_cap_multilingual_datase import ConceptCapMultilingualLoaderTrain, ConceptCapMultilingualLoaderVal
+
 # from .vqa_dataset import VQAClassificationDataset
 from .nlvr2_dataset import NLVR2Dataset, NLVR2Loader
 # from .refer_expression_dataset import ReferExpressionDataset
@@ -23,7 +21,7 @@ from .gqa_dataset import GQAClassificationDataset, GQAClassificationLoader
 # from .guesswhat_pointing_dataset import GuessWhatPointingDataset
 # from .flickr_grounding_dataset import FlickrGroundingDataset
 from .wikipedias_dataset import WikipediasDataset
-
+from .retrieval_dataset_multilingual import RetrievalDatasetVal_Multilingual
 __all__ = [
     # "VQAClassificationDataset",
     # "GenomeQAClassificationDataset",
@@ -79,7 +77,7 @@ DatasetMapEval = {
     # "VCR_QA-R": VCRDataset,
     "RetrievalCOCO": RetrievalDatasetVal,
     "RetrievalFlickr30k": RetrievalDatasetVal,
-    "RetrievalxFlickrCO": RetrievalDatasetVal,
+    "RetrievalxFlickrCO": RetrievalDatasetVal_Multilingual,
     # "refcoco": ReferExpressionDataset,
     # "refcoco+": ReferExpressionDataset,
     # "refcocog": ReferExpressionDataset,
@@ -94,3 +92,4 @@ DatasetMapEval = {
     "XVNLI": VisualEntailmentDataset,
     "RetrievalWIT": RetrievalDatasetVal,
 }
+

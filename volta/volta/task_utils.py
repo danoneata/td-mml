@@ -14,7 +14,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 from transformers import AutoTokenizer
 
-from volta.datasets._image_features_reader import ImageFeaturesH5Reader
+from volta.datasets._image_features_reader import ImageFeaturesH5Reader,ImageFeaturesH5Reader_cc
 
 logger = logging.getLogger(__name__)
 
@@ -446,8 +446,13 @@ def LoadDatasetEval(args, config, task_cfg, task_id):
     # initialize the feature reader
     feats_h5path1 = args.val_features_lmdbpath or task_cfg[task]["features_h5path1"]
     feats_h5path2 = task_cfg[task]["features_h5path2"]
-    features_reader1 = ImageFeaturesH5Reader(feats_h5path1, config, args.in_memory) if feats_h5path1 != "" else None
-    features_reader2 = ImageFeaturesH5Reader(feats_h5path2, config, args.in_memory) if feats_h5path2 != "" else None
+    print('feats_h5path1',feats_h5path1)
+    if 'conceptual_captions' in feats_h5path1:
+        features_reader1 = ImageFeaturesH5Reader_cc(feats_h5path1, config, args.in_memory) if feats_h5path1 != "" else None
+        features_reader2 = ImageFeaturesH5Reader_cc(feats_h5path2, config, args.in_memory) if feats_h5path2 != "" else None
+    else:
+        features_reader1 = ImageFeaturesH5Reader(feats_h5path1, config, args.in_memory) if feats_h5path1 != "" else None
+        features_reader2 = ImageFeaturesH5Reader(feats_h5path2, config, args.in_memory) if feats_h5path2 != "" else None
 
     batch_size = task_cfg[task].get("eval_batch_size", args.batch_size)
     if args.local_rank != -1:
@@ -462,7 +467,7 @@ def LoadDatasetEval(args, config, task_cfg, task_id):
 
     val_annotations_jsonpath = args.val_annotations_jsonpath or task_cfg[task]["val_annotations_jsonpath"]
 
-    if task_name.startswith("Retrieval"): # or task_name == "xFlickr":
+    if task_name.startswith("Retrieval"):  # or task_name == "xFlickr":
         dset_val = DatasetMapEval[task_name](
             task=task_cfg[task]["name"],
             dataroot=task_cfg[task]["dataroot"],
@@ -479,6 +484,7 @@ def LoadDatasetEval(args, config, task_cfg, task_id):
             add_global_imgfeat=config.add_global_imgfeat,
             append_mask_sep=(config.fusion_method == 'vl-bert_vqa'),
             num_subiters=args.num_subiters,
+            id2key_dir = args.id2key_dir
         )
     else:
         dset_val = DatasetMapEval[task_name](
