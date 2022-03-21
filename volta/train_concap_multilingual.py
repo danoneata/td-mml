@@ -22,7 +22,7 @@ from pytorch_transformers.optimization import AdamW, WarmupLinearSchedule
 
 from volta.config import BertConfig
 from volta.encoders import BertForVLPreTraining
-from volta.datasets import ConceptCapLoaderTrain, ConceptCapLoaderVal, WikipediasDataset
+from volta.datasets import ConceptCapMultilingualLoaderTrain, ConceptCapMultilingualLoaderVal
 from volta.train_utils import freeze_layers, tbLogger, summary_parameters, save, resume
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -35,6 +35,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+LANGS = "af am ar az be bg bn br bs ca cs cy da de el en es et fa fi fr fy ga gd gl gu ha he hi hr hu hy id is it ja jv ka kk km kn ko lo lt lv mg mk ml mn mr ms my ne nl no or pa pl ps pt ro ru sd si sk sl so sq sr su sv sw ta th tl tr uk ur uz vi xh yi zh"
+LANGS = LANGS.split()  # type: List[str]
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -43,24 +47,17 @@ def parse_args():
                         help="The corpus annotations directory.")
     parser.add_argument("--features_path", default="datasets/conceptual_caption/imgfeats", type=str,
                         help="The corpus image features directory.")
-    parser.add_argument("--dataroot", default="datasets/wikipedia", type=str,
-                        help="The corpus annotations directory.")
-    parser.add_argument("--ann_files", default="datasets/wikipedia/txt/en.20180201.txt", type=str,
-                        help="Comma-separated paths to Wikipedia text files.")
-    parser.add_argument("--lgs", type=str, default="en",
-                        help="Languages (lg1-lg2-lg3 .. ex: en-fr-es-de)")
-    parser.add_argument("--lg_sampling_factor", type=float, default=-1,
-                        help="Language sampling factor")
+    parser.add_argument("--langs", type=str, default=LANGS, nargs="+", choices=LANGS,
+                        help="Languages loaded from the annotations path (lg1 lg2 lg3 .. ex: en fr es de). By default, use all languages.")
+    parser.add_argument("--langs_sampling_path", type=str,
+                        help="Path to file containing language and sample probabilities. If not provided, given a sample pick uniiformly a random language for which we have translation.")
     # Model
+    parser.add_argument("--from_pretrained", default="bert-base-uncased", type=str,
+                        help="Bert pre-trained model selected in the list: bert-base-uncased, roberta-base, ...")
     parser.add_argument("--bert_model", default="bert-base-uncased", type=str,
                         help="Bert pre-trained model selected in the list: bert-base-uncased, bert-large-uncased, ...")
     parser.add_argument("--config_file", type=str, default="config/vilbert_base.json",
                         help="The config file which specified the model details.")
-    parser.add_argument("--m_pretrained", default="bert-base-uncased", type=str,
-                        help="Bert pre-trained model selected in the list: bert-base-uncased, "
-                             "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
-    parser.add_argument("--x_pretrained", default="", type=str,
-                        help="Path to pretrained VOLTA model.")
     parser.add_argument("--resume_file", default="", type=str,
                         help="Resume from checkpoint")
     # Output
@@ -68,20 +65,16 @@ def parse_args():
                         help="The output directory where the model checkpoints will be written.")
     parser.add_argument("--logdir", default="logs", type=str,
                         help="The logging directory where the training logs will be written.")
+    parser.add_argument("--save_every_n_steps", default=10_000, type=int,
+                        help="Save the model every given number of steps")
     # Text
-    parser.add_argument("--max_m_seq_length", default=128, type=int,
+    parser.add_argument("--max_seq_length", default=36, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. \n"
                              "Sequences longer than this will be truncated, and sequences shorter \n"
-                             "than this will be padded (Wikipedia).")
-    parser.add_argument("--max_x_seq_length", default=36, type=int,
-                        help="The maximum total input sequence length after WordPiece tokenization. \n"
-                             "Sequences longer than this will be truncated, and sequences shorter \n"
-                             "than this will be padded (ConCap).")
+                             "than this will be padded.")
     # Training
-    parser.add_argument("--train_m_batch_size", default=512, type=int,
-                        help="Total batch size for text training (Wikipedia).")
-    parser.add_argument("--train_x_batch_size", default=512, type=int,
-                        help="Total batch size for cross-modal training (ConCap).")
+    parser.add_argument("--train_batch_size", default=512, type=int,
+                        help="Total batch size for training.")
     parser.add_argument("--learning_rate", default=1e-4, type=float,
                         help="The initial learning rate for Adam.")
     parser.add_argument("--gradient_accumulation_steps", dest="grad_acc_steps", type=int, default=1,
@@ -163,15 +156,12 @@ def main():
             print(config, file=f)
 
     cache = 5000
-    args.train_x_batch_size = args.train_x_batch_size // args.grad_acc_steps
+    args.train_batch_size = args.train_batch_size // args.grad_acc_steps
     if dist.is_available() and args.local_rank != -1:
         num_replicas = dist.get_world_size()
-        args.train_x_batch_size = args.train_x_batch_size // num_replicas
+        args.train_batch_size = args.train_batch_size // num_replicas
         args.num_workers = args.num_workers // num_replicas
         cache = cache // num_replicas
-    args.train_m_batch_size = args.train_m_batch_size // args.grad_acc_steps
-    if dist.is_available() and args.local_rank != -1:
-        args.train_m_batch_size = args.train_m_batch_size // num_replicas
 
     # Seed
     random.seed(args.seed)
@@ -181,26 +171,24 @@ def main():
         torch.cuda.manual_seed_all(args.seed)
 
     # Datasets
-    tokenizer = AutoTokenizer.from_pretrained(args.m_pretrained)
-
-    train_m_dataset = WikipediasDataset(args.dataroot, args.lgs.split("-"), args.lg_sampling_factor, tokenizer,
-                                        args.train_m_batch_size, max_seq_length=args.max_m_seq_length,
-                                        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
-
-    train_x_dataset = ConceptCapLoaderTrain(args.annotations_path, args.features_path, tokenizer, args.bert_model,
-                                            seq_len=args.max_x_seq_length, batch_size=args.train_x_batch_size,
-                                            num_workers=args.num_workers, local_rank=args.local_rank,
-                                            objective=args.objective, cache=cache, tokenizer_name=args.m_pretrained,
-                                            add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
-    valid_x_dataset = ConceptCapLoaderVal(args.annotations_path, args.features_path, tokenizer, args.bert_model,
-                                          seq_len=args.max_x_seq_length, batch_size=args.train_x_batch_size,
-                                          num_workers=2, objective=args.objective, tokenizer_name=args.m_pretrained,
-                                          add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
+    tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
+    train_dataset = ConceptCapMultilingualLoaderTrain(
+        args.annotations_path, args.features_path, tokenizer, args.bert_model,
+        seq_len=args.max_seq_length, langs=args.langs,
+        langs_sampling_path=args.langs_sampling_path, batch_size=args.train_batch_size,
+        num_workers=args.num_workers, local_rank=args.local_rank,
+        objective=args.objective, tokenizer_name=args.bert_model, cache=cache,
+        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
+    valid_dataset = ConceptCapMultilingualLoaderVal(
+        args.annotations_path, args.features_path, tokenizer, args.bert_model,
+        seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size, num_workers=2,
+        objective=args.objective, tokenizer_name=args.bert_model,
+        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
 
     # Task details
-    task_names = ["Conceptual_Caption+Wikipedia"]
-    task_ids = ["TASK00"]
-    task2num_iters = {"TASK00": train_x_dataset.num_dataset / args.train_x_batch_size}
+    task_names = ["Conceptual_Caption"]
+    task_ids = ["TASK0"]
+    task2num_iters = {"TASK0": train_dataset.num_dataset / args.train_batch_size}
 
     # Logging
     logdir = os.path.join(args.logdir, timestamp)
@@ -208,8 +196,8 @@ def main():
         tb_logger = tbLogger(logdir, save_path, task_names, task_ids, task2num_iters, args.grad_acc_steps)
 
     # Model
-    if args.m_pretrained:
-        model = BertForVLPreTraining.from_pretrained(args.m_pretrained, config=config,
+    if args.from_pretrained:
+        model = BertForVLPreTraining.from_pretrained(args.from_pretrained, config=config,
                                                      default_gpu=default_gpu, from_hf=True)
     else:
         model = BertForVLPreTraining(config)
@@ -218,7 +206,7 @@ def main():
     freeze_layers(model)
     no_decay = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
     bert_weight_name = json.load(open("config/" + "bert-base-uncased" + "_weight_name.json", "r"))
-    if not args.m_pretrained:
+    if not args.from_pretrained:
         param_optimizer = list(model.named_parameters())
         optimizer_grouped_parameters = [
             {"params": [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
@@ -244,22 +232,12 @@ def main():
             print(len(list(model.named_parameters())), len(optimizer_grouped_parameters))
     optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon, betas=args.adam_betas)
     num_train_optimization_steps = int(
-        train_x_dataset.num_dataset
-        / args.train_x_batch_size
+        train_dataset.num_dataset
+        / args.train_batch_size
         / args.grad_acc_steps
     ) * args.num_train_epochs
     warmup_steps = args.warmup_steps or args.warmup_proportion * num_train_optimization_steps
     scheduler = WarmupLinearSchedule(optimizer, warmup_steps=warmup_steps, t_total=num_train_optimization_steps)
-
-    # Load VOLTA weights
-    if args.x_pretrained:
-        state_dict = model.state_dict.copy()
-        x_state_dict = torch.load(args.x_pretrained, map_location="cpu")
-        for key, value in x_state_dict:
-            for name in config.v_layers:
-                if key.startswith(name):
-                    state_dict[key] = value
-        model.load_state_dict(state_dict)
 
     # Resume training
     start_iter_id, global_step, start_epoch, tb_logger, _ = \
@@ -289,33 +267,16 @@ def main():
     if default_gpu:
         summary_parameters(model, logger)
         logger.info("***** Running training *****")
-        logger.info("  Num examples = %d", train_x_dataset.num_dataset)
-        logger.info("  Batch size = %d", args.train_x_batch_size)
+        logger.info("  Num examples = %d", train_dataset.num_dataset)
+        logger.info("  Batch size = %d", args.train_batch_size)
         logger.info("  Num steps = %d", num_train_optimization_steps)
+
+    model.train()
 
     # Train
     for epoch_id in range(start_epoch, int(args.num_train_epochs)):
-        model.train()
-        for step, batch in enumerate(train_x_dataset):
-
-            # Wikipedia
-            if step % args.grad_acc_steps == 0:
-                for _ in range(args.grad_acc_steps):
-                    m_batch = train_m_dataset.sample()
-                    m_batch = tuple(t.cuda(device=device, non_blocking=True) for t in m_batch)
-                    input_ids, input_mask, segment_ids, lm_label_ids, image_feat, image_loc, image_mask = m_batch
-                    mlm_loss, _, _ = model(input_ids, image_feat, image_loc, segment_ids, input_mask, image_mask, lm_label_ids)
-                    if n_gpu > 1:
-                        mlm_loss = mlm_loss.mean()
-                    mlm_loss = mlm_loss / args.grad_acc_steps
-                    mlm_loss.backward()
-
-                if args.clip_grad_norm > 0:
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad_norm)
-                optimizer.step()
-                optimizer.zero_grad()
-
-            iter_id = start_iter_id + step + (epoch_id * len(train_x_dataset))
+        for step, batch in enumerate(train_dataset):
+            iter_id = start_iter_id + step + (epoch_id * len(train_dataset))
             batch = tuple(t.cuda(device=device, non_blocking=True) for t in batch[:-1])
 
             input_ids, input_mask, segment_ids, lm_label_ids, is_match, \
@@ -361,43 +322,23 @@ def main():
                 if default_gpu:
                     tb_logger.step_train_CC(epoch_id, iter_id,
                                             float(masked_loss_t), float(masked_loss_v), float(pair_match_loss),
-                                            optimizer.param_groups[0]["lr"], "TASK00", "train")
+                                            optimizer.param_groups[0]["lr"], "TASK0", "train")
 
             if (step % (20 * args.grad_acc_steps) == 0) and step != 0 and default_gpu:
                 tb_logger.showLossTrainCC()
 
-        # Do the evaluation
-        torch.set_grad_enabled(False)
-        numBatches = len(valid_x_dataset)
-        model.eval()
-        for step, batch in enumerate(valid_x_dataset):
-            batch = tuple(t.cuda(device=device, non_blocking=True) for t in batch[:-1])
-
-            input_ids, input_mask, segment_ids, lm_label_ids, is_match, \
-            image_feat, image_loc, image_cls, obj_labels, obj_confs, \
-            attr_labels, attr_confs, image_attrs, image_label, image_mask = batch
-
-            batch_size = input_ids.size(0)
-            masked_loss_t, masked_loss_v, pair_match_loss = model(input_ids, image_feat, image_loc, segment_ids,
-                                                                  input_mask, image_mask, lm_label_ids, image_label,
-                                                                  image_cls, obj_labels, obj_confs, attr_labels,
-                                                                  attr_confs, image_attrs, is_match)
-
-            loss = masked_loss_t + masked_loss_v + pair_match_loss
-            if n_gpu > 1:
-                loss = loss.mean()
-                masked_loss_t = masked_loss_t.mean()
-                masked_loss_v = masked_loss_v.mean()
-                pair_match_loss = pair_match_loss.mean()
-
-            if default_gpu:
-                tb_logger.step_val_CC(iter_id, float(masked_loss_t), float(masked_loss_v), float(pair_match_loss),
-                                      "TASK00", batch_size, "val")
-                sys.stdout.write("%d / %d \r" % (step, numBatches))
-                sys.stdout.flush()
-
-        torch.set_grad_enabled(True)
-        save(save_path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_logger, default_gpu)
+            if global_step > 0 and global_step % args.save_every_n_steps == 0:
+                save(
+                    save_path,
+                    logger,
+                    epoch_id,
+                    model,
+                    optimizer,
+                    scheduler,
+                    global_step,
+                    tb_logger,
+                    default_gpu,
+                )
 
     if default_gpu:
         tb_logger.txt_close()

@@ -305,7 +305,7 @@ def freeze_layers(model):
     fixed_layers = set(model.config.fixed_layers)  # e.g. "embeddings", "v_embeddings.LayerNorm", "layer.15.output.v_dense"
     for key, value in dict(model.named_parameters()).items():
         for name in fixed_layers:
-            if key.startswith(name):
+            if (key + '.').startswith(name + '.'):
                 value.requires_grad = False
 
 
@@ -346,12 +346,12 @@ def summary_parameters(model, logger=None):
     print_and_log('>> {:25s}\t{:.2f}\tM'.format('# TotalParams:', total_params / (1.0 * 10 ** 6)), logger)
 
 
-def save(path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_logger, default_gpu, score, is_best=False):
+def save(path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_logger, default_gpu, is_best=False):
     if default_gpu:
         # Save a trained model
         logger.info("** ** * Saving model * ** ** ")
         model_to_save = model.module if hasattr(model, "module") else model  # Only save the model it-self
-        output_model_file = os.path.join(path, "pytorch_model_" + str(epoch_id) + ".bin")
+        output_model_file = os.path.join(path, "pytorch_model_" + str(global_step) + ".bin")
         torch.save(model_to_save.state_dict(), output_model_file)
         if is_best:
             output_model_file = os.path.join(path, "pytorch_model_best.bin")
@@ -364,7 +364,7 @@ def save(path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_lo
              "global_step": global_step,
              "epoch_id": epoch_id,
              "tb_logger": tb_logger,
-             "score": score,
+             # "score": score,
              },
             output_checkpoint,
         )

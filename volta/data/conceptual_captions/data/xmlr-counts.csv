@@ -1,0 +1,102 @@
+ ISO code ; Language              ; Tokens (M) ;Desired number of characters in GCC
+    en    ; English               ;55608;152667374,00
+     vi   ; Vietnamese            ;24757;67968389,05
+     ru   ; Russian               ;23408;64264816,04
+    id    ; Indonesian            ;22704;62332039,62
+    fa    ; Persian               ;13259;36401537,76
+     ro   ; Romanian              ;10354;28426089,60
+    de    ; German                ;10297;28269600,60
+    fr    ; French                ;9780;26850217,91
+    es    ; Spanish               ;9374;25735576,97
+     no   ; Norwegian             ;8494;23319606,44
+     pt   ; Portuguese            ;8405;23075263,96
+    da    ; Danish                ;7823;21477428,91
+    hu    ; Hungarian             ;7807;21433502,17
+    fi    ; Finnish               ;6730;18476683,70
+     pl   ; Polish                ;6490;17817782,64
+    ko    ; Korean                ;5644;15495156,43
+    bg    ; Bulgarian             ;5487;15064125,33
+     nl   ; Dutch                 ;5025;13795740,80
+    it    ; Italian               ;4983;13680433,11
+    el    ; Greek                 ;4285;11764129,22
+     sk   ; Slovak                ;3525;9677609,22
+    he    ; Hebrew                ;3399;9331686,16
+    hr    ; Croatian              ;3297;9051653,22
+    ar    ; Arabic                ;2869;7876613,01
+     tr   ; Turkish               ;2736;7511472,01
+    cs    ; Czech                 ;2498;6858061,79
+     lt   ; Lithuanian            ;1835;5037847,64
+     th   ; Thai                  ;1834;5035102,21
+    ca    ; Catalan               ;1752;4809977,69
+    hi    ; Hindi                 ;1715;4708397,11
+     sl   ; Slovenian             ;1669;4582107,74
+     ms   ; Malay                 ;1318;3618464,95
+     lv   ; Latvian               ;1198;3289014,42
+     sq   ; Albanian              ;918;2520296,53
+    et    ; Estonian              ;843;2314389,95
+     sr   ; Serbian               ;843;2314389,95
+    az    ; Azerbaijani           ;783;2149664,69
+     ur   ; Urdu                  ;730;2004157,37
+     ta   ; Tamil                 ;595;1633525,53
+     tl   ; Filipino              ;556;1526454,11
+    ja    ; Japanese              ;530;1455073,16
+    bn    ; Bengali               ;525;1441346,05
+    is    ; Icelandic             ;505;1386437,63
+    gl    ; Galician              ;495;1358983,42
+    kk    ; Kazakh                ;476;1306820,42
+    ka    ; Georgian              ;469;1287602,48
+     mk   ; Macedonian            ;449;1232694,05
+    hy    ; Armenian              ;421;1155822,26
+    la    ; Latin                 ;390;1070714,21
+    be    ; Belarusian            ;362;993842,42
+     ml   ; Malayalam             ;313;859316,79
+     sw   ; Swahili               ;275;754990,79
+    eu    ; Basque                ;270;741263,68
+     zh   ; Chinese (Simplified)  ;259;711064,05
+     te   ; Telugu                ;249;683609,84
+     mn   ; Mongolian             ;248;680864,42
+     si   ; Sinhala               ;243;667137,32
+    af    ; Afrikaans             ;242;664391,90
+     ne   ; Nepali                ;237;650664,79
+     zh   ; Chinese (Traditional) ;176;483194,11
+     mr   ; Marathi               ;175;480448,68
+    kn    ; Kannada               ;169;463976,16
+    eo    ; Esperanto             ;157;431031,11
+    cy    ; Welsh                 ;141;387104,37
+    gu    ; Gujarati              ;140;384358,95
+     ps   ; Pashto                ;96;263560,42
+    ky    ; Kyrgyz                ;94;258069,58
+     uz   ; Uzbek                 ;91;249833,32
+     -    ; Hindi Romanized       ;88;241597,05
+    ga    ; Irish                 ;86;236106,21
+      -   ; Urdu Romanized        ;85;233360,79
+     sv   ; Swedish               ;77,8;213593,76
+     -    ; Bengali Romanized     ;77;211397,42
+    am    ; Amharic               ;68;186688,63
+     pa   ; Punjabi               ;68;186688,63
+    ku    ; Kurdish (Kurmanji)    ;66;181197,79
+     so   ; Somali                ;62;170216,11
+    ha    ; Hausa                 ;56;153743,58
+     my   ; Burmese               ;56;153743,58
+     sd   ; Sindhi                ;50;137271,05
+      -   ; Telugu Romanized      ;39;107071,42
+    km    ; Khmer                 ;36;98835,16
+     or   ; Oriya                 ;36;98835,16
+      -   ; Tamil Romanized       ;36;98835,16
+     yi   ; Yiddish               ;34;93344,32
+    fy    ; Western Frisian       ;29;79617,21
+     ug   ; Uyghur                ;27;74126,37
+     mg   ; Malagasy              ;25;68635,53
+    jv    ; Javanese              ;24;65890,11
+    gd    ; Scottish Gaelic       ;21;57653,84
+     lo   ; Lao                   ;17;46672,16
+     sa   ; Sanskrit              ;17;46672,16
+    br    ; Breton                ;16;43926,74
+     my   ; Burmese               ;15;41181,32
+    bs    ; Bosnian               ;14;38435,89
+     xh   ; Xhosa                 ;13;35690,47
+     su   ; Sundanese             ;10;27454,21
+     om   ; Oromo                 ;8;21963,37
+     uk   ; Ukrainian             ;6,5;17845,24
+    as    ; Assamese              ;5;13727,11
+;;Total;810152613,40
