@@ -986,12 +986,14 @@ class BertModel(BertPreTrainedModel):
         # Since we are adding it to the raw scores before the softmax, this is
         # effectively the same as removing these entirely.
         extended_attention_mask = extended_attention_mask.to(
-            dtype=next(self.parameters()).dtype
+            torch.float32
+            #dtype=next(self.parameters()).dtype
         )  # fp16 compatibility
         extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
 
         extended_image_attention_mask = extended_image_attention_mask.to(
-            dtype=next(self.parameters()).dtype
+            torch.float32
+            #dtype=next(self.parameters()).dtype
         )  # fp16 compatibility
         extended_image_attention_mask = (1.0 - extended_image_attention_mask) * -10000.0
 
@@ -1247,7 +1249,7 @@ class BertForVLTasks(BertPreTrainedModel):
 
         if self.task_cfg[task_id]["type"].startswith("V-logit"):
             vil_prediction = self.clfs_dict[task_id](self.dropout(sequence_output_v)) + (
-                (1.0 - image_attention_mask) * -10000.0).unsqueeze(2).to(dtype=next(self.parameters()).dtype)
+                #(1.0 - image_attention_mask) * -10000.0).unsqueeze(2).to(torch.float32)
         elif self.task_cfg[task_id]["type"] == "VL-binary-classifier":
             # NLVR
             vil_prediction = self.clfs_dict[task_id](pooled_output.view(-1, pooled_output.size(1) * 2))
