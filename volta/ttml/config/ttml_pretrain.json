@@ -1,0 +1,33 @@
+{
+    "root_dir": false,
+    "bert_model": "xlm-roberta-base",
+    "from_pretrained": "xlm-roberta-base",
+    "config_file": "config/ctrl_xuniter_base.json",
+    "annotations_path": "data/trans_cc/m2m-100-md-seed-1337",
+    "langs_sampling_path": "data/trans_cc/p-lang-and-sent-alpha-0.3.npz",
+    "features_path": "/home/mwp141/Working/volta/data/conceptual_captions/resnet101_faster_rcnn_genome_imgfeats/volta",
+    "output_dir":"checkpoints/test/ctrl_xuniter_ttml_multitask",
+    "logdir": "logs/conceptual_captions",
+    "save_every_n_steps": 10000,
+    "num_train_epochs": 10,
+    "train_batch_size": 10240,
+    "gradient_accumulation_steps": 4,
+    "max_seq_length": 66,
+    "learning_rate": 1e-4,
+    "adam_epsilon": 1e-6,
+    "adam_betas": [
+        0.9,
+        0.999
+    ],
+    "warmup_proportion": 0.1,
+    "seed": 42,
+    "local_rank": -1,
+    "num_workers": 25,
+    "distributed": true,
+    "objective": 1,
+    "weight_decay": 0.01,
+    "clip_grad_norm": 5.0,
+    "tasks": [
+        "mlm-multilingual"
+    ]
+}
