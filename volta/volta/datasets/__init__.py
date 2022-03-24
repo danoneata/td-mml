@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 from .concept_cap_dataset import ConceptCapLoaderTrain, ConceptCapLoaderVal
-from .concept_cap_multilingual_datase import ConceptCapMultilingualLoaderTrain, ConceptCapMultilingualLoaderVal
+from .concept_cap_multilingual_dataset import ConceptCapMultilingualLoaderTrain, ConceptCapMultilingualLoaderVal
 
 # from .vqa_dataset import VQAClassificationDataset
 from .nlvr2_dataset import NLVR2Dataset, NLVR2Loader
@@ -44,6 +44,7 @@ __all__ = [
     "XVNLI",
     "RetrievalWIT",
     "RetrievalWITLoader",
+    "RetrievalConcap",
     "",
 ]
 
@@ -91,5 +92,6 @@ DatasetMapEval = {
     # "FlickrGrounding": FlickrGroundingDataset,
     "XVNLI": VisualEntailmentDataset,
     "RetrievalWIT": RetrievalDatasetVal,
+    "RetrievalConcap": RetrievalDatasetVal,
 }
 

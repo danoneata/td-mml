@@ -280,7 +280,7 @@ def _load_annotationsVal(annotations_jsonpath, task):
         image_entries = {}
         caption_entries = []
         for annotation in reader:
-            if task == "RetrievalCOCO":
+            if task == "RetrievalCOCO" or task == "RetrievalConcap":
                 image_id = annotation["id"]
             elif task == "RetrievalFlickr30k":
                 image_id = int(annotation["img_path"].split(".")[0])

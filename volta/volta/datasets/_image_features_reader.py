@@ -317,8 +317,11 @@ class ImageFeaturesH5Reader_cc(ImageFeaturesH5Reader):
         else:
             # Read chunk from file everytime if not loaded in memory.
             with self.env.begin(write=False) as txn:
-                item = msgpack.loads(txn.get(image_id), raw=False)
-                item = dict(zip(self.FIELDNAMES, item))
+                try:
+                    item = msgpack.loads(txn.get(image_id), raw=False)
+                    item = dict(zip(self.FIELDNAMES, item))
+                except:
+                    item = pickle.loads(txn.get(image_id))
                 image_h = int(item["img_h"])
                 image_w = int(item["img_w"])
 

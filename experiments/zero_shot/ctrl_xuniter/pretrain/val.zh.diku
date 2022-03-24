@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --job-name=cc-en
+#SBATCH --ntasks=1 --cpus-per-task=20
+#SBATCH --mem=10GB
+#SBATCH -p gpu --gres=gpu:titanrtx:1
+#SBATCH --time=12:00:00
+#SBATCH --output="val.zh.log"
+
+TASK=0
+LANG=zh
+MODEL=ctrl_xuniter
+MODEL_CONFIG=ctrl_xuniter_base
+TASKS_CONFIG=iglue_test_tasks_boxes36.diku
+TETASK=RetrievalConcap-${LANG}
+PRETRAINED=/science/image/nlp-datasets/tt-mml/checkpoints/iglue/pretrain/ctrl_xuniter/ctrl_xuniter_base/pytorch_model_9.bin
+OUTPUT_DIR=/science/image/nlp-datasets/tt-mml/results/iglue/zero_shot/pretrain/${MODEL}/${MODEL_CONFIG}/$TETASK
+TEXT_PATH=/science/image/nlp-datasets/tt-mml/data/conceptual_captions/annotations/m2m-100-lg/${LANG}-valid-1000.jsonl
+
+source /science/image/nlp-datasets/tt-mml/envs/tt-mml/bin/activate
+
+cd ../../../../volta
+python eval_retrieval.py \
+  --bert_model /science/image/nlp-datasets/emanuele/huggingface/xlm-roberta-base --config_file config/${MODEL_CONFIG}.json \
+  --from_pretrained ${PRETRAINED} --num_val_workers 0 \
+  --tasks_config_file config_tasks/${TASKS_CONFIG}.yml --task $TASK --split val_${LANG} --batch_size 1 \
+  --caps_per_image 1 --num_subiters 10 --val_annotations_jsonpath ${TEXT_PATH} \
+  --output_dir ${OUTPUT_DIR} \
+  --zero_shot
+
+deactivate
+

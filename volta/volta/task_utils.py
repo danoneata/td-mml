@@ -484,7 +484,6 @@ def LoadDatasetEval(args, config, task_cfg, task_id):
             add_global_imgfeat=config.add_global_imgfeat,
             append_mask_sep=(config.fusion_method == 'vl-bert_vqa'),
             num_subiters=args.num_subiters,
-            id2key_dir = args.id2key_dir
         )
     else:
         dset_val = DatasetMapEval[task_name](

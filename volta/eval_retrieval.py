@@ -90,7 +90,7 @@ def parse_args():
                         help="whether use chunck for parallel training.")
     #add for retireval_dataset_multilingual
     parser.add_argument("--id2key_dir", default="", type=str,
-                        help="whether use chunck for parallel training.")
+                        help="")
     return parser.parse_args()
 
 
