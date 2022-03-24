@@ -447,12 +447,9 @@ def LoadDatasetEval(args, config, task_cfg, task_id):
     feats_h5path1 = args.val_features_lmdbpath or task_cfg[task]["features_h5path1"]
     feats_h5path2 = task_cfg[task]["features_h5path2"]
     print('feats_h5path1',feats_h5path1)
-    if 'conceptual_captions' in feats_h5path1:
-        features_reader1 = ImageFeaturesH5Reader_cc(feats_h5path1, config, args.in_memory) if feats_h5path1 != "" else None
-        features_reader2 = ImageFeaturesH5Reader_cc(feats_h5path2, config, args.in_memory) if feats_h5path2 != "" else None
-    else:
-        features_reader1 = ImageFeaturesH5Reader(feats_h5path1, config, args.in_memory) if feats_h5path1 != "" else None
-        features_reader2 = ImageFeaturesH5Reader(feats_h5path2, config, args.in_memory) if feats_h5path2 != "" else None
+
+    features_reader1 = ImageFeaturesH5Reader(feats_h5path1, config, args.in_memory) if feats_h5path1 != "" else None
+    features_reader2 = ImageFeaturesH5Reader(feats_h5path2, config, args.in_memory) if feats_h5path2 != "" else None
 
     batch_size = task_cfg[task].get("eval_batch_size", args.batch_size)
     if args.local_rank != -1:
