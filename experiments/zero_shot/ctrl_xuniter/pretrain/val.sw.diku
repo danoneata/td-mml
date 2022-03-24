@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=cc-en
+#SBATCH --job-name=cc-sw
 #SBATCH --ntasks=1 --cpus-per-task=20
 #SBATCH --mem=10GB
 #SBATCH -p gpu --gres=gpu:titanrtx:1
-#SBATCH --time=12:00:00
+#SBATCH --time=02:00:00
 #SBATCH --output="val.sw.log"
 
 TASK=0
