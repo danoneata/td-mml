@@ -191,6 +191,9 @@ class tbLogger(object):
         logger.info(lossInfo)
         print(lossInfo, file=self.txt_f)
         return score
+    
+    def update_task_num_iters(self,task_id, nums):
+        self.task_num_iters[task_id]+=nums
 
     def showLossTrain(self):
         # show the current loss, once showed, reset the loss.
