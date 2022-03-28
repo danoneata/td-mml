@@ -76,6 +76,7 @@ DatasetMapEval = {
     # "GenomeQA": GenomeQAClassificationDataset,
     # "VCR_Q-A": VCRDataset,
     # "VCR_QA-R": VCRDataset,
+    "RetrievalConcap":RetrievalDatasetVal,
     "RetrievalCOCO": RetrievalDatasetVal,
     "RetrievalFlickr30k": RetrievalDatasetVal,
     "RetrievalxFlickrCO": RetrievalDatasetVal_Multilingual,
