@@ -20,10 +20,12 @@ random.seed(1)
 device = "cpu"
 
 
+def load_langs():
+    with open("data/langs-common.txt", "r") as f:
+        return [line.strip() for line in f.readlines()]
+
+
 def load_data():
-    def load_langs():
-        with open("data/langs-common.txt", "r") as f:
-            return [line.strip() for line in f.readlines()]
     def load_data_lang(lang):
         print("Loading data for", lang)
         with open(f"data/cc/translations/m2m-100-md-seed-1337/{lang}-train.json", "r") as f:
