@@ -41,8 +41,8 @@ LANG_COUNTS = load_language_counts()
 TARGET_LANGUAGES = [d["code"] for d in LANG_COUNTS if d["code"] != "en"]
 
 
-def load_data(split, folder):
-    path = os.path.join(PATH_DATA, folder, f"en-{split}.json")
+def load_data(split, language, folder):
+    path = os.path.join(PATH_DATA, folder, f"{language}-{split}.json")
     with open(path, "r") as f:
         return json.load(f)
 
@@ -135,17 +135,22 @@ def main(split, language, model_type, seed, device="cuda", verbose=False):
         print(f"Exiting...")
         sys.exit(1)
 
-    data = load_data(split, folder)
+    data = load_data(split, "en", folder)
     model = load_model(model_type, device)
 
     keys = list(data.keys())
 
-    if split == "train":
+    if split == "train" and model_type == "m2m-100-md":
         # update base seed to have different sentences sampled for each language
         seed = seed + TARGET_LANGUAGES.index(language)
         random.seed(seed)
         random.shuffle(keys)
         count_target = first(d["count"] for d in LANG_COUNTS if d["code"] == language)
+    elif split == "train" and model_type == "m2m-100-lg":
+        # use the same keys as the m2m-100-md model
+        data_md = load_data(split, language, f"m2m-100-md-seed-{seed:04d}")
+        keys = list(data_md.keys())
+        count_target = None
     else:
         # for validation translate all sentences
         count_target = None
