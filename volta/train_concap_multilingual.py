@@ -179,11 +179,11 @@ def main():
         num_workers=args.num_workers, local_rank=args.local_rank,
         objective=args.objective, tokenizer_name=args.bert_model, cache=cache,
         add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
-    valid_dataset = ConceptCapMultilingualLoaderVal(
-        args.annotations_path, args.features_path, tokenizer, args.bert_model,
-        seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size, num_workers=2,
-        objective=args.objective, tokenizer_name=args.bert_model,
-        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
+    # valid_dataset = ConceptCapMultilingualLoaderVal(
+    #     args.annotations_path, args.features_path, tokenizer, args.bert_model,
+    #     seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size, num_workers=2,
+    #     objective=args.objective, tokenizer_name=args.bert_model,
+    #     add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
 
     # Task details
     task_names = ["Conceptual_Caption"]
