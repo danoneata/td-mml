@@ -324,21 +324,22 @@ def main():
                                             float(masked_loss_t), float(masked_loss_v), float(pair_match_loss),
                                             optimizer.param_groups[0]["lr"], "TASK0", "train")
 
+                if global_step > 0 and global_step % args.save_every_n_steps == 0:
+                    save(
+                        save_path,
+                        logger,
+                        epoch_id,
+                        model,
+                        optimizer,
+                        scheduler,
+                        global_step,
+                        tb_logger,
+                        default_gpu,
+                    )
+
             if (step % (20 * args.grad_acc_steps) == 0) and step != 0 and default_gpu:
                 tb_logger.showLossTrainCC()
 
-            if global_step > 0 and global_step % args.save_every_n_steps == 0:
-                save(
-                    save_path,
-                    logger,
-                    epoch_id,
-                    model,
-                    optimizer,
-                    scheduler,
-                    global_step,
-                    tb_logger,
-                    default_gpu,
-                )
 
     if default_gpu:
         tb_logger.txt_close()
