@@ -215,7 +215,7 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         self.sample_language = self.prepare_langauge_sampler(langs_sampling_path)
 
     def prepare_langauge_sampler(self, path):
-        if path is None:
+        if path is None or path == "":
             return LanguageSamplingDefault(self.captions)
         elif os.path.exists(path):
             return LanguageSamplingGiven(path)

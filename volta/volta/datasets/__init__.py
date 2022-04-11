@@ -21,7 +21,7 @@ from .gqa_dataset import GQAClassificationDataset, GQAClassificationLoader
 # from .guesswhat_pointing_dataset import GuessWhatPointingDataset
 # from .flickr_grounding_dataset import FlickrGroundingDataset
 from .wikipedias_dataset import WikipediasDataset
-from .retrieval_dataset_multilingual import RetrievalDatasetVal_Multilingual
+
 __all__ = [
     # "VQAClassificationDataset",
     # "GenomeQAClassificationDataset",
@@ -79,7 +79,7 @@ DatasetMapEval = {
     "RetrievalConcap":RetrievalDatasetVal,
     "RetrievalCOCO": RetrievalDatasetVal,
     "RetrievalFlickr30k": RetrievalDatasetVal,
-    "RetrievalxFlickrCO": RetrievalDatasetVal_Multilingual,
+    "RetrievalxFlickrCO": RetrievalDatasetVal,
     # "refcoco": ReferExpressionDataset,
     # "refcoco+": ReferExpressionDataset,
     # "refcocog": ReferExpressionDataset,
