@@ -1,19 +1,18 @@
 #!/bin/bash
-#SBATCH --job-name=430K-en-cc
+#SBATCH --job-name=430K-zh-random-cc
 #SBATCH --ntasks=1 --cpus-per-task=20
 #SBATCH --mem=10GB
-#SBATCH -p gpu --gres=gpu
+#SBATCH -p gpu --gres=gpu:titanx:1
 #SBATCH --time=5:00:00
-#SBATCH --output="logs/val.en.lg-sample.step_430000.log"
+#SBATCH --output="logs/val.zh.lg-random.step_430000.log"
 
 TASK=0
-LANG=en
+LANG=zh
 TRAIN_BATCH_SIZE=64
 STEP=430000
 EPOCH=9
-STRATEGY=sample_lg
+STRATEGY=random_lg
 PRETRAIN_FILE=pytorch_model_epoch_9_step_430000.bin
-
 
 echo "task":$TASK
 echo "lang":$LANG
@@ -29,7 +28,7 @@ TEXT_PATH=$DIR/data/conceptual_captions/annotations/m2m-100-lg/${LANG}-valid-100
 TETASK=RetrievalConcap-${LANG}-${STRATEGY}-batch_size_${TRAIN_BATCH_SIZE}-step_${STEP}
 
 PRETRAINED=$DIR/checkpoints/iglue/pretrain/ctrl_ttmml_${STRATEGY}/${MODEL_CONFIG}/train_batch_size_${TRAIN_BATCH_SIZE}/conceptual_captions-${STRATEGY}/${PRETRAIN_FILE}
-OUTPUT_DIR=$DIR/tt-mml-iglue/experiments/zero_shot/ctrl_ttmml_${STRATEGY}/pretrain/multilingual_val/results/${MODEL_CONFIG}/${TETASK}
+OUTPUT_DIR=$DIR/tt-mml-iglue/experiments/zero_shot/ctrl_ttmml_${STRATEGY}/pretrain/multilingual_val/results/${MODEL_CONFIG}/TETASK
 
 source /science/image/nlp-datasets/tt-mml/envs/tt-mml/bin/activate
 

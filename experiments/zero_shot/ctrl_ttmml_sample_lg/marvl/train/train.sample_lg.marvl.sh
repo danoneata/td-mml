@@ -12,7 +12,7 @@ TASKS_CONFIG=iglue_trainval_tasks_boxes36.dtu
 DIR=/science/image/nlp-datasets/tt-mml
 
 STRATEGY=sample_lg
-STEP=43000
+STEP=430000
 TRAIN_BATCH_SIZE=64
 PRETRAIN_FILE=pytorch_model_epoch_9_step_430000.bin
 TETASK=marvl-${STRATEGY}-batch_size_${TRAIN_BATCH_SIZE}-step_${STEP}

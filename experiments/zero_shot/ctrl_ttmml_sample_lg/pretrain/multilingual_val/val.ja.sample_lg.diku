@@ -1,19 +1,18 @@
 #!/bin/bash
-#SBATCH --job-name=430K-en-cc
+#SBATCH --job-name=430K-ja-cc
 #SBATCH --ntasks=1 --cpus-per-task=20
 #SBATCH --mem=10GB
-#SBATCH -p gpu --gres=gpu
+#SBATCH -p gpu --gres=gpu:titanx:1
 #SBATCH --time=5:00:00
-#SBATCH --output="logs/val.en.lg-sample.step_430000.log"
+#SBATCH --output="logs/val.ja.lg-sample.step_430000.log"
 
 TASK=0
-LANG=en
+LANG=ja
 TRAIN_BATCH_SIZE=64
 STEP=430000
 EPOCH=9
 STRATEGY=sample_lg
 PRETRAIN_FILE=pytorch_model_epoch_9_step_430000.bin
-
 
 echo "task":$TASK
 echo "lang":$LANG
