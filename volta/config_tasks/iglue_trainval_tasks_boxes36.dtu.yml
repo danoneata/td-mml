@@ -26,9 +26,9 @@ TASK12:
   process: nlvr
   task_id: 12
   format: 'serialized_lmdb'
-  dataroot: /home/projects/ku_00062/data/nlvr2/annotations
-  features_h5path1: /home/projects/ku_00062/data/nlvr2/features/nlvr2-train_boxes36.lmdb
-  features_h5path2: /home/projects/ku_00062/data/nlvr2/features/nlvr2-dev_boxes36.lmdb
+  dataroot: /science/image/nlp-datasets/emanuele/data/nlvr2/annotations
+  features_h5path1: /science/image/nlp-datasets/emanuele/data/nlvr2/features/nlvr2-train_boxes36.lmdb
+  features_h5path2: /science/image/nlp-datasets/emanuele/data/nlvr2/features/nlvr2-dev_boxes36.lmdb
   train_annotations_jsonpath: ''
   val_annotations_jsonpath: ''
   max_seq_length: 80

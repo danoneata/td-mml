@@ -349,7 +349,7 @@ def summary_parameters(model, logger=None):
     print_and_log('>> {:25s}\t{:.2f}\tM'.format('# TotalParams:', total_params / (1.0 * 10 ** 6)), logger)
 
 
-def save(path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_logger, default_gpu, is_best=False):
+def save(path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_logger, default_gpu,score=0.0, is_best=False):
     if default_gpu:
         # Save a trained model
         logger.info("** ** * Saving model * ** ** ")
@@ -367,10 +367,12 @@ def save(path, logger, epoch_id, model, optimizer, scheduler, global_step, tb_lo
              "global_step": global_step,
              "epoch_id": epoch_id,
              "tb_logger": tb_logger,
-             # "score": score,
+             "score": score,
              },
             output_checkpoint,
         )
+
+
 
 
 def resume(path, model, optimizer, scheduler, tb_logger):

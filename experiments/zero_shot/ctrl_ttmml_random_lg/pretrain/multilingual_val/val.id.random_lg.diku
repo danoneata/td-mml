@@ -1,0 +1,45 @@
+#!/bin/bash
+#SBATCH --job-name=430K-id-random-cc
+#SBATCH --ntasks=1 --cpus-per-task=20
+#SBATCH --mem=10GB
+#SBATCH -p gpu --gres=gpu:titanx:1
+#SBATCH --time=5:00:00
+#SBATCH --output="logs/val.id.lg-random.step_430000.log"
+
+TASK=0
+LANG=id
+TRAIN_BATCH_SIZE=64
+STEP=430000
+EPOCH=9
+STRATEGY=random_lg
+PRETRAIN_FILE=pytorch_model_epoch_9_step_430000.bin
+
+echo "task":$TASK
+echo "lang":$LANG
+echo "Train_batch_size":$TRAIN_BATCH_SIZE
+echo "Strategy":$STRATEGY
+echo "PRETRAIN_FILE":$PRETRAIN_FILE
+
+MODEL=ctrl_xuniter
+MODEL_CONFIG=ctrl_xuniter_base
+TASKS_CONFIG=iglue_test_tasks_boxes36.diku
+DIR=/science/image/nlp-datasets/tt-mml
+TEXT_PATH=$DIR/data/conceptual_captions/annotations/m2m-100-lg/${LANG}-valid-1000.jsonl
+TETASK=RetrievalConcap-${LANG}-${STRATEGY}-batch_size_${TRAIN_BATCH_SIZE}-step_${STEP}
+
+PRETRAINED=$DIR/checkpoints/iglue/pretrain/ctrl_ttmml_${STRATEGY}/${MODEL_CONFIG}/train_batch_size_${TRAIN_BATCH_SIZE}/conceptual_captions-${STRATEGY}/${PRETRAIN_FILE}
+OUTPUT_DIR=$DIR/tt-mml-iglue/experiments/zero_shot/ctrl_ttmml_${STRATEGY}/pretrain/multilingual_val/results/${MODEL_CONFIG}/TETASK
+
+source /science/image/nlp-datasets/tt-mml/envs/tt-mml/bin/activate
+
+cd ../../../../../volta
+python eval_retrieval.py \
+  --bert_model /science/image/nlp-datasets/emanuele/huggingface/xlm-roberta-base --config_file config/${MODEL_CONFIG}.json \
+  --from_pretrained ${PRETRAINED} --num_val_workers 0 \
+  --tasks_config_file config_tasks/${TASKS_CONFIG}.yml --task $TASK --split val_${LANG} --batch_size 1 \
+  --caps_per_image 1 --num_subiters 20 --val_annotations_jsonpath ${TEXT_PATH} \
+  --output_dir ${OUTPUT_DIR} \
+  --zero_shot
+
+deactivate
+
