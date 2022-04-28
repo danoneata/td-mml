@@ -10,7 +10,7 @@ TASK0:
   features_h5path1: /science/image/nlp-datasets/tt-mml/data/conceptual_captions/features/cc-valid_boxes36.lmdb
   features_h5path2: ''
   train_annotations_jsonpath: ''
-  val_annotations_jsonpath: /science/image/nlp-datasets/tt-mml/data/conceptual_captions/annotations/m2m-100-lg/en-valid-1000.jsonl
+  val_annotations_jsonpath: /science/image/nlp-datasets/tt-mml/data/conceptual_captions/annotations/langs_83/m2m-100-lg/en-valid-1000.jsonl
   max_seq_length: 80
   max_region_num: 36
   batch_size: 64
@@ -24,11 +24,11 @@ TASK8:
   process: retrieval
   task_id: 8
   format: 'lmdb'
-  dataroot: /home/projects/ku_00062/data/flickr30k
-  features_h5path1: /home/projects/ku_00062/data/xFlickrCO/features/xflickrco-test_boxes36.lmdb
+  dataroot: /science/image/nlp-datasets/tt-mml/data/zero-shot/flickr30k
+  features_h5path1: /science/image/nlp-datasets/tt-mml/data/zero-shot/xFlickrCO/features/xflickrco-test_boxes36.lmdb
   features_h5path2: ''
   train_annotations_jsonpath: ''
-  val_annotations_jsonpath: /home/projects/ku_00062/data/xFlickrCO/annotations/en/test.jsonl
+  val_annotations_jsonpath: /science/image/nlp-datasets/tt-mml/data/zero-shot/xFlickrCO/annotations/en/test.jsonl
   max_seq_length: 80
   max_region_num: 36
   batch_size: 64
@@ -42,8 +42,8 @@ TASK12:
   process: nlvr
   task_id: 12
   format: 'lmdb'
-  dataroot: /home/projects/ku_00062/data/nlvr2/annotations
-  features_h5path1: /home/projects/ku_00062/data/nlvr2/features/nlvr2_boxes36.lmdb
+  dataroot: /science/image/nlp-datasets/tt-mml/data/zero-shot/nlvr2/annotations
+  features_h5path1: /science/image/nlp-datasets/tt-mml/data/zero-shot/nlvr2/features/nlvr2_boxes36.lmdb
   features_h5path2: ''
   train_annotations_jsonpath: ''
   val_annotations_jsonpath: ''
@@ -61,8 +61,8 @@ TASK15:
   process: normal
   task_id: 15
   format: 'lmdb'
-  dataroot: /home/projects/ku_00062/data/gqa/annotations
-  features_h5path1: /home/projects/ku_00062/data/gqa/features/vg-gqa_boxes36.lmdb
+  dataroot: /science/image/nlp-datasets/tt-mml/data/zero-shot/gqa/annotations
+  features_h5path1: /science/image/nlp-datasets/tt-mml/data/zero-shot/gqa/features/vg-gqa_boxes36.lmdb
   features_h5path2: ''
   train_annotations_jsonpath: ''
   val_annotations_jsonpath: ''
@@ -80,11 +80,11 @@ TASK19:
   process: normal
   task_id: 19
   format: 'lmdb'
-  dataroot: /home/projects/ku_00062/data/XVNLI/annotations/en
-  features_h5path1: /home/projects/ku_00062/data/flickr30k/features/flickr30k_boxes36.lmdb
+  dataroot: /science/image/nlp-datasets/tt-mml/data/zero-shot/XVNLI/annotations/en
+  features_h5path1: /science/image/nlp-datasets/tt-mml/data/zero-shot/flickr30k/features/flickr30k_boxes36.lmdb
   features_h5path2: ''
   train_annotations_jsonpath: ''
-  val_annotations_jsonpath: /home/projects/ku_00062/data/XVNLI/annotations/en/test.jsonl
+  val_annotations_jsonpath: /science/image/nlp-datasets/tt-mml/data/zero-shot/XVNLI/annotations/en/test.jsonl
   max_seq_length: 80
   max_region_num: 36
   batch_size: 1024
@@ -97,11 +97,11 @@ TASK20:
   process: retrieval
   task_id: 20
   format: 'lmdb'
-  dataroot: /home/projects/ku_00062/data/wit
-  features_h5path1: /home/projects/ku_00062/data/wit/features/wit-en_test_boxes36.lmdb
+  dataroot: /science/image/nlp-datasets/tt-mml/data/zero-shot/wit
+  features_h5path1: /science/image/nlp-datasets/tt-mml/data/zero-shot/wit/features/wit_test_boxes36.lmdb
   features_h5path2: ''
   train_annotations_jsonpath: ''
-  val_annotations_jsonpath: /home/projects/ku_00062/data/wit/annotations/test_en.jsonl
+  val_annotations_jsonpath: /science/image/nlp-datasets/tt-mml/data/zero-shot/wit/annotations/test_en.jsonl
   max_seq_length: 80
   max_region_num: 36
   batch_size: 64

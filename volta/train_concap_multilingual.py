@@ -11,7 +11,6 @@ import random
 import logging
 import argparse
 from io import open
-
 import numpy as np
 
 import torch
@@ -36,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 LANGS = "af am ar az be bg bn br bs ca cs cy da de el en es et fa fi fr fy ga gd gl gu ha he hi hr hu hy id is it ja jv ka kk km kn ko lo lt lv mg mk ml mn mr ms my ne nl no or pa pl ps pt ro ru sd si sk sl so sq sr su sv sw ta th tl tr uk ur uz vi xh yi zh"
-LANGS = LANGS.split()  # type: List[str]
+# LANGS = LANGS.split()  # type: List[str]
 
 
 def parse_args():
@@ -47,8 +46,10 @@ def parse_args():
                         help="The corpus annotations directory.")
     parser.add_argument("--features_path", default="datasets/conceptual_caption/imgfeats", type=str,
                         help="The corpus image features directory.")
-    parser.add_argument("--langs", type=str, default=LANGS, nargs="+", choices=LANGS,
+    parser.add_argument("--langs", type=str, default=LANGS,
                         help="Languages loaded from the annotations path (lg1 lg2 lg3 .. ex: en fr es de). By default, use all languages.")
+    # parser.add_argument("--langs", type=str, default=LANGS, nargs="+", choices=LANGS,
+    #                     help="Languages loaded from the annotations path (lg1 lg2 lg3 .. ex: en fr es de). By default, use all languages.")
     parser.add_argument("--langs_sampling_path", type=str,
                         help="Path to file containing language and sample probabilities. If not provided, given a sample pick uniiformly a random language for which we have translation.")
     # Model
@@ -170,6 +171,9 @@ def main():
     if n_gpu > 0:
         torch.cuda.manual_seed_all(args.seed)
 
+    if not isinstance(args.langs, list):
+        args.langs = args.langs.split()
+    logger.info(f"pretrain langs: {args.langs}")
     # Datasets
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
     train_dataset = ConceptCapMultilingualLoaderTrain(
