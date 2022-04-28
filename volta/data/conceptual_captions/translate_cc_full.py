@@ -31,8 +31,8 @@ def read(path, parse=lambda line: line.strip()):
         return list(map(parse, f.readlines()))
 
 
-# TARGET_LANGUAGES = "de zh ja fr cs".split()
-# TARGET_LANGUAGES = "id sw ta tr zh".split()
+# TARGET_LANGUAGES = "de zh ja fr cs".split()  # UC2 languages
+# TARGET_LANGUAGES = "id sw ta tr zh".split()  # MaRVL languages
 TARGET_LANGUAGES = read("data/langs-iglue.txt")
 
 
