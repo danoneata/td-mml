@@ -4,7 +4,6 @@ import os
 import pdb
 import random
 import shelve
-import socket
 import sys
 
 from typing import Dict, List
@@ -16,7 +15,15 @@ from toolz import first, partition_all
 
 from easynmt import EasyNMT
 
-from translate_cc import PATH_DATA, MODEL_TYPES, load_data, load_model, save_data, translate
+from translate_cc import (
+    PATH_DATA,
+    MODEL_TYPES,
+    get_batch_size,
+    load_data,
+    load_model,
+    save_data,
+    translate,
+)
 
 
 def read(path, parse=lambda line: line.strip()):
@@ -33,9 +40,10 @@ TARGET_LANGUAGES = read("data/langs-iglue.txt")
 @click.option("-s", "--split", type=click.Choice(["train", "valid"]), help="data split")
 @click.option("-l", "--language", type=click.Choice(TARGET_LANGUAGES), help="target language")
 @click.option("-m", "--model", "model_type", type=click.Choice(MODEL_TYPES), help="translation model")
+@click.option("-b", "--batch-size", "batch_size", type=click.INT, default=None, help="if not set, estimated based on the machine")
 @click.option("--device")
 @click.option("-v", "--verbose", is_flag=True)
-def main(split, language, model_type, device="cuda", verbose=False):
+def main(split, language, model_type, batch_size=None, device="cuda", verbose=False):
     # load English data and cached translations from `folder_input`
     folder_input = model_type + "-seed-1337"
     folder_output = model_type + "-full"
@@ -47,20 +55,7 @@ def main(split, language, model_type, device="cuda", verbose=False):
 
     data = load_data(split, "en", folder_input)
     model = load_model(model_type, device)
-
-    if device == "cpu":
-        batch_size = 16
-    else:
-        if model_type == "m2m-100-md":
-            if socket.gethostname() == "tesla":
-                batch_size = 16
-            else:
-                batch_size = 8
-        else:
-            if socket.gethostname() == "tesla":
-                batch_size = 8
-            else:
-                batch_size = 4
+    batch_size = batch_size or get_batch_size(model_type, device)
 
     path_cache = os.path.join(PATH_DATA, folder_input, ".cache", f"{language}-{split}")
     with shelve.open(path_cache) as data_cached:

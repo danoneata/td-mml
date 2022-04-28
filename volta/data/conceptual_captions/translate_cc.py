@@ -62,6 +62,23 @@ def load_model(model_type, device):
         assert False
 
 
+def get_batch_size(model_type, device) -> int:
+    if device == "cpu":
+        batch_size = 16
+    else:
+        if model_type == "m2m-100-md":
+            if socket.gethostname() == "tesla":
+                batch_size = 16
+            else:
+                batch_size = 8
+        else:
+            if socket.gethostname() == "tesla":
+                batch_size = 8
+            else:
+                batch_size = 4
+    return batch_size
+
+
 def translate(data, model, language, batch_size, data_cached, count_target=None, keys=None, verbose=0):
     keys = keys or data.keys()
 
@@ -155,16 +172,7 @@ def main(split, language, model_type, seed, device="cuda", verbose=False):
         # for validation translate all sentences
         count_target = None
 
-    if model_type == "m2m-100-md":
-        if socket.gethostname() == "tesla":
-            batch_size = 16
-        else:
-            batch_size = 8
-    else:
-        if socket.gethostname() == "tesla":
-            batch_size = 8
-        else:
-            batch_size = 4
+    batch_size = get_batch_size(model_type, device)
 
     path_cache = os.path.join(PATH_DATA, folder, ".cache", f"{language}-{split}")
     with shelve.open(path_cache) as data_cached:
