@@ -1,0 +1,4 @@
+click
+toolz
+tqdm
+easynmt
