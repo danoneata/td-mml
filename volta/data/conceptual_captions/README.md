@@ -92,19 +92,24 @@ python translate_cc_full.py -s train -m m2m-100-md -l ro
 
 ---
 
-## Translate all captions in the IGLUE langauges using the large translation model
+## Translate all captions in the IGLUE languages using the large M2M translation model
 
 Download the keys for which we are lacking a translation
 ```bash
 wget https://sharing.speed.pub.ro/owncloud/index.php/s/k9HEyTUy0du8aTO -O data/missing-keys.json
 ```
 
-Install Python requirements:
+Install the Python requirements:
 ```bash
 pip install -r requirements.txt
 ```
 
-Run translation:
+Put the English data at the following location:
+```bash
+ls data/cc/translations/m2m-100-lg-seed-1337/en-train.json
+```
+
+Run the translation process:
 ```bash
 python translate_cc_full.py --s train -l ar -m m2m-100-lg -b 8 -k data/missing-keys.json --device cuda:0
 ```
