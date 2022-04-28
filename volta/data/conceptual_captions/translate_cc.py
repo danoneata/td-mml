@@ -49,6 +49,7 @@ def load_data(split, language, folder):
 
 def save_data(data, split, language, folder):
     path = os.path.join(PATH_DATA, folder, f"{language}-{split}.json")
+    os.makedirs(os.path.join(PATH_DATA, folder), exist_ok=True)
     with open(path, "w") as f:
         json.dump(data, f, ensure_ascii=False)
 
