@@ -19,7 +19,14 @@ from easynmt import EasyNMT
 from translate_cc import PATH_DATA, MODEL_TYPES, load_data, load_model, save_data, translate
 
 
-TARGET_LANGUAGES = "de zh ja fr cs".split()
+def read(path, parse=lambda line: line.strip()):
+    with open(path, "r") as f:
+        return list(map(parse, f.readlines()))
+
+
+# TARGET_LANGUAGES = "de zh ja fr cs".split()
+# TARGET_LANGUAGES = "id sw ta tr zh".split()
+TARGET_LANGUAGES = read("data/langs-iglue.txt")
 
 
 @click.command(help="Translate the full Conceptual Captions (CC) dataset into a target language")
@@ -38,19 +45,22 @@ def main(split, language, model_type, device="cuda", verbose=False):
         print(f"Exiting...")
         sys.exit(1)
 
-    data = load_data(split, folder_input)
+    data = load_data(split, "en", folder_input)
     model = load_model(model_type, device)
 
-    if model_type == "m2m-100-sm":
-        if socket.gethostname() == "tesla":
-            batch_size = 16
-        else:
-            batch_size = 8
+    if device == "cpu":
+        batch_size = 16
     else:
-        if socket.gethostname() == "tesla":
-            batch_size = 8
+        if model_type == "m2m-100-md":
+            if socket.gethostname() == "tesla":
+                batch_size = 16
+            else:
+                batch_size = 8
         else:
-            batch_size = 4
+            if socket.gethostname() == "tesla":
+                batch_size = 8
+            else:
+                batch_size = 4
 
     path_cache = os.path.join(PATH_DATA, folder_input, ".cache", f"{language}-{split}")
     with shelve.open(path_cache) as data_cached:
