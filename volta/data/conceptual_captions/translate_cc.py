@@ -81,12 +81,13 @@ def get_batch_size(model_type, device) -> int:
 
 def translate(data, model, language, batch_size, data_cached, count_target=None, keys=None, verbose=0):
     keys = keys or data.keys()
+    num_keys = len(keys)
 
     count = 0
     data_tr = dict()
     to_break = False
 
-    for keys in partition_all(batch_size, keys):
+    for i, keys in enumerate(partition_all(batch_size, keys)):
 
         if all(key in data_cached for key in keys):
             sentences = [data[key] for key in keys]
@@ -129,7 +130,14 @@ def translate(data, model, language, batch_size, data_cached, count_target=None,
         else:
             count_target_str = "{:9d}".format(count_target) if count_target else "∞"
             print(
-                "{} · {:12s} · {:9d} / {}".format(language, key, count, count_target_str),
+                "{} · {:12s} · {:7d} / {:7d} · {:9d} / {}".format(
+                    language,
+                    key,
+                    i * batch_size,
+                    num_keys,
+                    count,
+                    count_target_str,
+                ),
                 end="\r",
                 flush=True,
             )
