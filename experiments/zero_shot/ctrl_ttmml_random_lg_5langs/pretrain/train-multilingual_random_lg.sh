@@ -4,7 +4,7 @@
 #SBATCH --mem=45GB
 #SBATCH -p gpu --gres=gpu:titanrtx:2
 #SBATCH --time=16:30:00
-#SBATCH --output="pretrain-cc.multilingual.random-lg.ptr-5langs.log"
+#SBATCH --output="logs/pretrain-cc.multilingual.random-lg.ptr-5langs.log"
 
 LANGS=5
 LANGS_SET="id sw ta tr zh"

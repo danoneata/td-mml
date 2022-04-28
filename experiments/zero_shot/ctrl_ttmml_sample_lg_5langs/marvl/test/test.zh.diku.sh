@@ -4,7 +4,7 @@
 #SBATCH --mem=30GB
 #SBATCH -p gpu --gres=gpu
 #SBATCH --time=2:00:00
-#SBATCH --output="log/marvl-zh.sample_lg.step_100000.batch_size_256.langs_5.out"
+#SBATCH --output="logs/marvl-zh.sample_lg.step_100000.batch_size_256.langs_5.out"
 
 LANG=zh
 STRATEGY=sample_lg

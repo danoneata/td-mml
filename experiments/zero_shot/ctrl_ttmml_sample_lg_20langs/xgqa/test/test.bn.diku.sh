@@ -4,7 +4,7 @@
 #SBATCH --mem=30GB
 #SBATCH -p gpu --gres=gpu:titanx:1
 #SBATCH --time=2:00:00
-#SBATCH --output="log/xgqa-bn.sample_lg.step_100000.batch_size_256.langs_20.out"
+#SBATCH --output="logs/xgqa-bn.sample_lg.step_100000.batch_size_256.langs_20.out"
 
 LANG=bn
 STRATEGY=sample_lg
