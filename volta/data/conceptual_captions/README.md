@@ -89,3 +89,25 @@ Translate the entire English CC captions:
 ```bash
 python translate_cc_full.py -s train -m m2m-100-md -l ro
 ```
+
+---
+
+## Translate all captions in the IGLUE langauges using the large translation model
+
+Download the keys for which we are lacking a translation
+```bash
+wget https://sharing.speed.pub.ro/owncloud/index.php/s/k9HEyTUy0du8aTO -O data/missing-keys.json
+```
+
+Install Python requirements:
+```bash
+pip install -r requirements.txt
+```
+
+Run translation:
+```bash
+python translate_cc_full.py --s train -l ar -m m2m-100-lg -b 8 -k data/missing-keys.json --device cuda:0
+```
+
+The `-b` flag sets the batch size.
+For the large translation model, `m2m-100-lg` I have used a batch size of 8 on machines with 15GB of memory (Tesla T4).
