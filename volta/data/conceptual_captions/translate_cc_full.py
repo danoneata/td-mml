@@ -61,7 +61,7 @@ def main(split, language, model_type, batch_size=None, path_keys=None, device="c
     if path_keys:
         with open(path_keys, "r") as f:
             lang_to_keys = json.load(f)
-            keys = lang_to_keys[languages]
+            keys = lang_to_keys[language]
     else:
         keys = data.keys()
 
