@@ -106,7 +106,7 @@ pip install -r requirements.txt
 
 Put the English data at the following location:
 ```bash
-ls data/cc/translations/m2m-100-lg-seed-1337/en-train.json
+ls data/cc/translations/m2m-100-lg-full/en-train.json
 ```
 
 Run the translation process:
