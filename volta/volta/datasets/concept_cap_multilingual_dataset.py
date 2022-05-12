@@ -1,4 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Facebook, Inc. and its affiliates.
 # Copyright (c) 2020, Emanuele Bugliarello (@e-bug).
 
 # This source code is licensed under the MIT license found in the
@@ -69,17 +70,20 @@ class ConceptCapMultilingualLoaderTrain(ConceptCapLoaderTrain):
         num_locs=5,
         add_global_imgfeat=None,
         tokenizer_name="bert-base-uncased",
+        lmdb_file = None
     ):
+        if lmdb_file is None:
+            if dist.is_available() and local_rank != -1:
+                rank = dist.get_rank()
+                lmdb_file = os.path.join(features_path, "training_feat_part_" + str(rank) + ".lmdb")
+            else:
+                lmdb_file = os.path.join(features_path, "training_feat_all.lmdb")
 
-        if dist.is_available() and local_rank != -1:
-            rank = dist.get_rank()
-            lmdb_file = os.path.join(features_path, "training_feat_part_" + str(rank) + ".lmdb")
+                print("Loading from %s" % lmdb_file)
+
+            ds = td.LMDBSerializer.load(lmdb_file, shuffle=False)
         else:
-            lmdb_file = os.path.join(features_path, "training_feat_all.lmdb")
-
-            print("Loading from %s" % lmdb_file)
-
-        ds = td.LMDBSerializer.load(lmdb_file, shuffle=False)
+            ds = lmdb_file
         self.num_dataset = len(ds)
         ds = td.LocallyShuffleData(ds, cache)
 

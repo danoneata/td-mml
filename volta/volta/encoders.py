@@ -957,7 +957,7 @@ class BertModel(BertPreTrainedModel):
             self.shared_embeddings = True
 
     def forward(self, input_txt, input_imgs, image_loc, token_type_ids=None, attention_mask=None,
-                image_attention_mask=None, output_all_encoded_layers=False, output_all_attention_masks=False):
+                image_attention_mask=None, output_all_encoded_layers=False, output_all_attention_masks=False,position_ids=None):
         if attention_mask is None:
             attention_mask = torch.ones_like(input_txt)
         if token_type_ids is None:
@@ -966,7 +966,7 @@ class BertModel(BertPreTrainedModel):
             image_attention_mask = torch.ones(input_imgs.size(0), input_imgs.size(1)).type_as(input_txt)
 
         if self.shared_embeddings:
-            embedding_output, v_embedding_output = self.embeddings(input_txt, input_imgs, image_loc, token_type_ids)
+            embedding_output, v_embedding_output = self.embeddings(input_txt, input_imgs, image_loc, token_type_ids,position_ids)
         else:
             embedding_output = self.embeddings(input_txt, token_type_ids)
             v_embedding_output = self.v_embeddings(input_imgs, image_loc)
@@ -986,14 +986,14 @@ class BertModel(BertPreTrainedModel):
         # Since we are adding it to the raw scores before the softmax, this is
         # effectively the same as removing these entirely.
         extended_attention_mask = extended_attention_mask.to(
+            # dtype=next(self.parameters()).dtype
             torch.float32
-            #dtype=next(self.parameters()).dtype
         )  # fp16 compatibility
         extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
 
         extended_image_attention_mask = extended_image_attention_mask.to(
+            # dtype=next(self.parameters()).dtype
             torch.float32
-            #dtype=next(self.parameters()).dtype
         )  # fp16 compatibility
         extended_image_attention_mask = (1.0 - extended_image_attention_mask) * -10000.0
 
@@ -1086,6 +1086,7 @@ class BertForVLPreTraining(BertPreTrainedModel):
         attr_confs=None,
         image_attrs=None,
         next_sentence_label=None,
+        position_ids=None,
         output_all_encoded_layers=False,
         output_all_attention_masks=False,
     ):
@@ -1099,6 +1100,7 @@ class BertForVLPreTraining(BertPreTrainedModel):
             image_attention_mask,
             output_all_encoded_layers=output_all_encoded_layers,
             output_all_attention_masks=output_all_attention_masks,
+            position_ids=position_ids
         )
         if output_all_encoded_layers:
             sequence_output_t = encoded_layers_t[-1]
@@ -1200,7 +1202,7 @@ class BertForVLTasks(BertPreTrainedModel):
         state_dict = torch.load(ckpt_file, map_location="cpu")
         self.clfs_dict[task_id].weight.data = state_dict['cls.bi_seq_relationship.weight'].data[1:, :]
         self.clfs_dict[task_id].bias.data = state_dict['cls.bi_seq_relationship.bias'].data[1:]
-        del state_dict        
+        del state_dict
 
     def forward(
         self,
@@ -1248,6 +1250,8 @@ class BertForVLTasks(BertPreTrainedModel):
             raise ValueError("Invalid fusion method: %s" % self.fusion_method)
 
         if self.task_cfg[task_id]["type"].startswith("V-logit"):
+            # vil_prediction = self.clfs_dict[task_id](self.dropout(sequence_output_v)) + (
+            #     (1.0 - image_attention_mask) * -10000.0).unsqueeze(2).to(dtype=next(self.parameters()).dtype)
             vil_prediction = self.clfs_dict[task_id](self.dropout(sequence_output_v)) + (
                 (1.0 - image_attention_mask) * -10000.0).unsqueeze(2).to(torch.float32)
         elif self.task_cfg[task_id]["type"] == "VL-binary-classifier":
