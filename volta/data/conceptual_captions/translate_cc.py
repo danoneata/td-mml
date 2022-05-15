@@ -96,12 +96,16 @@ def translate(data, model, language, batch_size, data_cached, count_target=None,
             to_cache = False
         else:
             sentences = [data[key] for key in keys]
-            sentences_tr = model.translate_sentences(
-                sentences,
-                target_lang=language,
-                source_lang="en",
-                batch_size=batch_size,
-            )
+            try:
+                sentences_tr = model.translate_sentences(
+                    sentences,
+                    target_lang=language,
+                    source_lang="en",
+                    batch_size=batch_size,
+                )
+            except RuntimeError:
+                print("WARN batch size was too large!")
+                continue
             to_cache = True
 
         for key, sentence_tr in zip(keys, sentences_tr):
