@@ -7,6 +7,7 @@ import os
 from typing import Any, List, Dict, TypedDict
 
 import click
+import shelve
 
 from tqdm import tqdm
 from toolz import merge
@@ -23,8 +24,9 @@ BASE_PATH = "data/cc/analysis-cache"
 Scored = TypedDict("Scored", {"key": str, "score": float})
 
 
-def save_data(data: Dict, lang: str) -> None:
-    with open(f"data/cc/analysis-cache/{lang}.json", "w") as f:
+def save_data(data: Dict, lang: str, subset: bool) -> None:
+    suffix = "-subset" if subset else ""
+    with open(f"data/cc/analysis-cache/{lang}{suffix}.json", "w") as f:
         json.dump(data, f, indent=4)
 
 
@@ -40,10 +42,11 @@ def compute_lm_score(data):
     pdb.set_trace()
 
 
-def compute_uniformity(data: Dict) -> List[Scored]:
+def compute_uniformity(data: Dict, cache) -> List[Scored]:
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 
+    @shelve_cache(cache)
     def do1(datum):
         tokens = tokenizer(datum["text-tgt"])["input_ids"]
         unique = set(tokens)  # unique tokens
@@ -66,9 +69,10 @@ def compute_sim_tgt_src(data: Dict) -> List[Scored]:
     pass
 
 
-def compute_bleu_translated(data: Dict) -> List[Scored]:
+def compute_bleu_translated(data: Dict, cache) -> List[Scored]:
     from nltk.translate.bleu_score import sentence_bleu
 
+    @shelve_cache(cache)
     def do1(datum):
         return sentence_bleu([datum["text-src"]], datum["text-tgt"])
 
@@ -81,18 +85,32 @@ def compute_bleu_translated(data: Dict) -> List[Scored]:
     ]
 
 
-def cache(func, name):
-    path = os.path.join(BASE_PATH, ".cache", name + ".pkl")
-    def wrapped(*args, **kwargs):
-        if os.path.exists(path):
-            with open(path, "rb") as f:
-                return pickle.load(f)
-        else:
-            res = func(*args, **kwargs)
-            with open(path, "wb") as f:
-                pickle.dump(res, f)
-            return res
+# def cache(func, name):
+#     path = os.path.join(BASE_PATH, ".cache", name + ".pkl")
+#     def wrapped(*args, **kwargs):
+#         if os.path.exists(path):
+#             with open(path, "rb") as f:
+#                 return pickle.load(f)
+#         else:
+#             res = func(*args, **kwargs)
+#             with open(path, "wb") as f:
+#                 pickle.dump(res, f)
+#             return res
+# 
+#     return wrapped
 
+
+def shelve_cache(cache):
+    def wrapped(func):
+        def inner(datum):
+            key = datum["key"]
+            try:
+                return cache[key]
+            except KeyError:
+                result = func(datum)
+                cache[key] = result
+                return result
+        return inner
     return wrapped
 
 
@@ -113,7 +131,7 @@ FEATURES = {
 
 
 
-LANGUAGES = "ar bg bn da de el fr id ja ko pt ru sw ta tr vi zh".split()
+LANGUAGES = "ar bg bn da de el es et fr id ja ko pt ru sw ta tr vi zh".split()
 
 
 @click.command(help="Extract translation features")
@@ -130,7 +148,14 @@ LANGUAGES = "ar bg bn da de el fr id ja ko pt ru sw ta tr vi zh".split()
     multiple=True,
     help="name of features",
 )
-def main(lang: str, features: List[str]) -> None:
+@click.option(
+    "-s",
+    "--subset",
+    is_flag=True,
+    default=False,
+    help="compute only on part of the keys",
+)
+def main(lang: str, features: List[str], subset: bool) -> None:
 
     split = "train"
     folder = "m2m-100-lg-full"
@@ -138,8 +163,11 @@ def main(lang: str, features: List[str]) -> None:
     data_src = load_data(split, "en", folder)
     data_tgt = load_data(split, lang, folder)
 
-    with open(os.path.join(BASE_PATH, "keys.json"), "r") as f:
-        keys = json.load(f)
+    if subset:
+        with open(os.path.join(BASE_PATH, "keys.json"), "r") as f:
+            keys = json.load(f)
+    else:
+        keys = list(data_src.keys())
 
     data = [
         {
@@ -150,9 +178,17 @@ def main(lang: str, features: List[str]) -> None:
         for key in tqdm(keys)
     ]
 
-    feature_data = {feat: cache(FEATURES[feat], lang + "-" + feat)(data) for feat in features}
+    def get_shelve_path(lang: str, feat: str) -> str:
+        return os.path.join(BASE_PATH, ".cache-shelve", lang + "-" + feat)
+
+    feature_data = {}
+    for feat in features:
+        with shelve.open(get_shelve_path(lang, feat)) as cache:
+            feature_data[feat] = FEATURES[feat](data, cache)
+
+    # feature_data = {feat: cache(FEATURES[feat], lang + "-" + feat)(data) for feat in features}
     feature_data = merge_features(feature_data, data)
-    save_data(feature_data, lang)
+    save_data(feature_data, lang, subset)
 
 
 if __name__ == "__main__":
