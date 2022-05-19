@@ -6,7 +6,7 @@ def load_data(lang):
         return json.load(f)
 
 
-def save_data(lang):
+def save_data(data, lang):
     with open(f"data/cc/translations/m2m-100-lg-filtered/{lang}.json", "w") as f:
         json.dump(data, f, ensure_ascii=False)
 
@@ -96,15 +96,20 @@ threshs = {
 }
 
 
+langs = threshs.keys()
+metrics = threshs["ar"].keys()
+
+
 def is_valid(datum, lang):
     return all(datum["scores"][m] <= threshs[lang][m] for m in metrics)
 
 
 def main():
     for lang in langs:
-        data = load_data(lang)
-        data = {datum["key"]: datum["text-tgt"] for datum in data if is_valid(datum, lang)} 
-        save_data(lang)
+        data1 = load_data(lang)
+        data2 = {datum["key"]: datum["text-tgt"] for datum in data1 if is_valid(datum, lang)} 
+        print("{} · {} → {} ({:.2%})".format(lang, len(data1), len(data2), len(data2) / len(data1)))
+        save_data(data2, lang)
 
 
 if __name__ == "__main__":
