@@ -293,7 +293,7 @@ def main():
     for epoch_id in range(start_epoch, int(args.num_train_epochs)):
         for step, batch in enumerate(train_dataset):
             #itm_hard
-            if step % args.grad_acc_steps*2 == 0 and step >0:
+            if step % (args.grad_acc_steps*2) == 0 and step >0:
                 for _ in range(args.grad_acc_steps):
                     vtlm_batch = next(train_vtlm_dataset, None)
                     if vtlm_batch is not None:
@@ -313,6 +313,7 @@ def main():
                             vtlm_loss = vtlm_loss.mean()
                         vtlm_loss = vtlm_loss /args.grad_acc_steps
                         vtlm_loss.backward()
+                        logger.info("  runs in vtlm step and loss =%f %f",step, vtlm_loss)
 
                 if args.clip_grad_norm > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad_norm)

@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=20lg-random-pretrain-cc
-#SBATCH --ntasks=1 --cpus-per-task=20 --mem=45GB
-#SBATCH -p gpu --gres=gpu:titanrtx:3
-#SBATCH --time=3:30:00
+#SBATCH --ntasks=1 --cpus-per-task=20 --mem=60GB
+#SBATCH -p gpu --gres=gpu:titanrtx:2
+#SBATCH --time=3-12:30:00
 #SBATCH --output="pretrain-cc.multilingual.random-lg.ptr-20langs.log"
 
 LANGS=20

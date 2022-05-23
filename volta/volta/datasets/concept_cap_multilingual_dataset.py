@@ -221,12 +221,7 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
 
     def prepare_langauge_sampler(self, path):
         if path is None or path == "":
-            if len(self.langs) <= 20:
-                logger.info("prepare_langauge_sampler with LanguageSamplingFilter class")
-                return LanguageSamplingFilter(self.captions, self.langs)
-            else:
-                logger.info("prepare_langauge_sampler with LanguageSamplingDefault class")
-                return LanguageSamplingDefault(self.captions)
+            return LanguageSamplingDefault(self.captions)
 
         elif os.path.exists(path):
             return LanguageSamplingGiven(path, self.langs)
@@ -271,20 +266,6 @@ class LanguageSamplingDefault:
             if image_id in captions_lang
         ]
         return random.choice(langs_translated)
-
-class LanguageSamplingFilter:
-    """Uniformly picks one of the languages for which we have a translation."""
-    def __init__(self, captions, langs):
-        self.captions = captions
-        self.langs = langs
-
-    def __call__(self, image_id):
-        lang = random.choice(self.langs)
-
-        while image_id not in self.captions[lang].keys():
-            lang = random.choice(self.langs)
-        return lang
-
 
 class LanguageSamplingGiven:
     """Picks a language based on the probabilities specified at the given path.
