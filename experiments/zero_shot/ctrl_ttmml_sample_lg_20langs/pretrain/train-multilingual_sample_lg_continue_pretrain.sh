@@ -1,20 +1,19 @@
 #!/bin/bash
-#SBATCH --job-name=lg-sample-pretrain-cc
-#SBATCH --ntasks=1 --cpus-per-task=20
-#SBATCH --mem=45GB
-#SBATCH -p gpu --gres=gpu:titanrtx:2
+#SBATCH --job-name=20lg-sample-pretrain-cc
+#SBATCH --ntasks=1 --cpus-per-task=20 --mem=40GB
+#SBATCH -p gpu --gres=gpu:titanrtx:3
 #SBATCH --time=8-00:30:00
-#SBATCH --output="pretrain-cc.multilingual.sample-lg.continuePT2.log"
+#SBATCH --output="pretrain-cc.multilingual.sample-lg.continuePT2.20langs.log"
 
 LANGS=20
-LANGS_SET="ar bg bn da de el es et fr id ja ko pt ru sw ta tr vi zh"
+LANGS_SET=ar-bg-bn-da-de-el-en-es-et-fr-id-ja-ko-pt-ru-sw-ta-tr-vi-zh
 DATA=/science/image/nlp-datasets/emanuele/data/conceptual_captions
 DIR=/science/image/nlp-datasets/tt-mml
 FEATS=$DATA/resnet101_faster_rcnn_genome_imgfeats/volta
-ANNOS=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/m2m-100-lg-seed-1337
+ANNOS=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/m2m-100-lg-filtered
 MODEL_CONFIG=ctrl_xuniter_base
 
-LANG_SAMPLING=$DIR/data/conceptual_captions/annotations/p-lang-and-sent-alpha-0.3.npz
+LANG_SAMPLING=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/p-lang-and-sent-alpha-0.3.npz
 STRATEGY=sample_lg
 TRAIN_BATCH_SIZE=256
 WARMUP_Proportion=0.05
@@ -37,7 +36,7 @@ python train_concap_multilingual.py \
   --config_file config/${MODEL_CONFIG}.json \
   --train_batch_size $TRAIN_BATCH_SIZE \
   --gradient_accumulation_steps 4 \
-  --max_seq_length 66 \
+  --max_seq_length 40 \
   --learning_rate 1e-4 --adam_epsilon 1e-6 --adam_betas 0.9 0.999 --weight_decay 0.01 --warmup_proportion $WARMUP_Proportion --clip_grad_norm 5.0 \
   --objective 1 \
   --annotations_path $ANNOS \

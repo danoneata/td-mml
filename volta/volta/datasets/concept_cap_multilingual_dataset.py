@@ -216,13 +216,20 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         self.bert_model = bert_model
         self.num_locs = num_locs
         self.tokenizer_name = tokenizer_name
+        self.langs_sampling_path = langs_sampling_path
         self.sample_language = self.prepare_langauge_sampler(langs_sampling_path)
 
     def prepare_langauge_sampler(self, path):
         if path is None or path == "":
-            return LanguageSamplingDefault(self.captions)
+            if len(self.langs) <= 20:
+                logger.info("prepare_langauge_sampler with LanguageSamplingFilter class")
+                return LanguageSamplingFilter(self.captions, self.langs)
+            else:
+                logger.info("prepare_langauge_sampler with LanguageSamplingDefault class")
+                return LanguageSamplingDefault(self.captions)
+
         elif os.path.exists(path):
-            return LanguageSamplingGiven(path)
+            return LanguageSamplingGiven(path, self.langs)
         else:
             assert False, "path should be `None` or exist:\n{}".format(path)
 
@@ -242,9 +249,11 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         else:
             # Pick the correpsonding caption of the current image from a random
             # language for which we have the translation.
+
             lang = self.sample_language(image_id)
             caption = self.captions[lang][image_id]
             label = 0
+
         return caption, label
 
 
@@ -263,6 +272,19 @@ class LanguageSamplingDefault:
         ]
         return random.choice(langs_translated)
 
+class LanguageSamplingFilter:
+    """Uniformly picks one of the languages for which we have a translation."""
+    def __init__(self, captions, langs):
+        self.captions = captions
+        self.langs = langs
+
+    def __call__(self, image_id):
+        lang = random.choice(self.langs)
+
+        while image_id not in self.captions[lang].keys():
+            lang = random.choice(self.langs)
+        return lang
+
 
 class LanguageSamplingGiven:
     """Picks a language based on the probabilities specified at the given path.
@@ -274,7 +296,7 @@ class LanguageSamplingGiven:
     https://colab.research.google.com/drive/1bH3vyF6YhniM7XVXyIHoiDpHN57Kth1O
 
     """
-    def __init__(self, path):
+    def __init__(self, path, langs_=None):
         data = np.load(path)
         p_lang_and_sent = data["p_lang_and_sent"]
         langs = data["langs"]
@@ -283,12 +305,20 @@ class LanguageSamplingGiven:
         p_sent = p_lang_and_sent.sum(axis=0, keepdims=True)
         p_lang_given_sent = p_lang_and_sent / p_sent
         # data needed by `__call__`
+
         self.langs = langs
         self.p_lang_given_sent = {
             sent: p_lang_given_sent[:, i]
             for i, sent in enumerate(sents)
         }
+        self.langs_ = langs_
 
     def __call__(self, image_id):
         p = self.p_lang_given_sent[image_id]
-        return random.choices(self.langs, weights=p)[0]
+        if self.langs_ is None:
+            return random.choices(self.langs, weights=p)[0]
+        else:
+            out_langs = None
+            while out_langs not in self.langs_:
+                out_langs = random.choices(self.langs, weights=p)[0]
+            return out_langs

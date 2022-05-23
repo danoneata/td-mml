@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 LANGS = "af am ar az be bg bn br bs ca cs cy da de el en es et fa fi fr fy ga gd gl gu ha he hi hr hu hy id is it ja jv ka kk km kn ko lo lt lv mg mk ml mn mr ms my ne nl no or pa pl ps pt ro ru sd si sk sl so sq sr su sv sw ta th tl tr uk ur uz vi xh yi zh"
-# LANGS = LANGS.split()  # type: List[str]
+LANGS = LANGS.split()  # type: List[str]
 
 
 def parse_args():
@@ -172,7 +172,7 @@ def main():
         torch.cuda.manual_seed_all(args.seed)
 
     if not isinstance(args.langs, list):
-        args.langs = args.langs.split()
+        args.langs = args.langs.split('-')
     logger.info(f"pretrain langs: {args.langs}")
     # Datasets
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
@@ -180,7 +180,7 @@ def main():
     train_vtlm_dataset = ConceptCapVTLM_LoaderTrain(
         args.annotations_path, args.features_path, tokenizer, args.bert_model,
         seq_len=args.max_seq_length, langs=args.langs,
-        langs_sampling_path=args.langs_sampling_path, batch_size=args.train_batch_size,
+        langs_sampling_path=args.langs_sampling_path, batch_size=args.train_batch_size//2,
         num_workers=args.num_workers, local_rank=args.local_rank,
         objective=args.objective, tokenizer_name=args.bert_model, cache=cache,
         add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
@@ -302,7 +302,7 @@ def main():
                         image_feat, image_loc, image_cls, obj_labels, obj_confs, \
                         attr_labels, attr_confs, image_attrs, image_label, image_mask = vtlm_batch
 
-                        mlm_loss, _, _ = model(input_ids=input_ids, image_feat=image_feat, image_loc=image_loc,
+                        vtlm_loss, _, _ = model(input_ids=input_ids, image_feat=image_feat, image_loc=image_loc,
                                                        token_type_ids = segment_ids,attention_mask = input_mask,
                                                         image_attention_mask=image_mask,
                                                        masked_lm_labels = lm_label_ids, image_cls = image_cls,
@@ -310,8 +310,8 @@ def main():
                                                        attr_labels = attr_labels, attr_confs = attr_confs,
                                                        image_attrs = image_attrs,image_label=image_label)
                         if n_gpu > 1:
-                            mlm_loss = mlm_loss.mean()
-                        vtlm_loss = mlm_loss /args.grad_acc_steps
+                            vtlm_loss = vtlm_loss.mean()
+                        vtlm_loss = vtlm_loss /args.grad_acc_steps
                         vtlm_loss.backward()
 
                 if args.clip_grad_norm > 0:

@@ -1,25 +1,26 @@
 #!/bin/bash
-#SBATCH --job-name=5lg-random-pretrain-cc
-#SBATCH --ntasks=1 --cpus-per-task=20
-#SBATCH -p gpu --gres=gpu:titanrtx:2
-#SBATCH --time=16:30:00
-#SBATCH --output="logs/pretrain-cc.multilingual.random-lg.ptr-5langs.log"
+#SBATCH --job-name=20langs-vtlm-pretrain-cc
+#SBATCH --ntasks=1 --cpus-per-task=20 --mem=40GB
+#SBATCH -p gpu --gres=gpu:titanx:4
+#SBATCH --time=3-2:00:00
+#SBATCH --output="pretrain-cc.multilingual.vtlm-random_lg.log"
 
-LANGS=5
-LANGS_SET=id-sw-ta-tr-zh
+LANGS=20
+LANGS_SET=ar-bg-bn-da-de-el-en-es-et-fr-id-ja-ko-pt-ru-sw-ta-tr-vi-zh
 DATA=/science/image/nlp-datasets/emanuele/data/conceptual_captions
 DIR=/science/image/nlp-datasets/tt-mml
 FEATS=$DATA/resnet101_faster_rcnn_genome_imgfeats/volta
 ANNOS=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/m2m-100-lg-filtered
 MODEL_CONFIG=ctrl_xuniter_base
 
-
-STRATEGY=random_lg
+LANG_SAMPLING=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/p-lang-and-sent-alpha-0.3.npz
+STRATEGY=vtlm
 TRAIN_BATCH_SIZE=256
 WARMUP_Proportion=0.05
 
 echo "train_batch_size":$TRAIN_BATCH_SIZE
 echo "strategy":$STRATEGY
+echo "pretrain langs":$LANGS
 
 TETASK=conceptual_captions-${STRATEGY}
 OUTPUT_DIR=$DIR/checkpoints/iglue/pretrain/ctrl_ttmml_${STRATEGY}_${LANGS}langs/${MODEL_CONFIG}/train_batch_size_${TRAIN_BATCH_SIZE}/${TETASK}
@@ -29,7 +30,7 @@ source /science/image/nlp-datasets/tt-mml/envs/tt-mml/bin/activate
 
 cd ../../../../volta
 
-python train_concap_multilingual.py \
+python train_concap_ttmml.py \
   --bert_model xlm-roberta-base \
   --from_pretrained xlm-roberta-base \
   --config_file config/${MODEL_CONFIG}.json \

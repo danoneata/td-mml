@@ -7,7 +7,7 @@
 from .concept_cap_dataset import ConceptCapLoaderTrain, ConceptCapLoaderVal
 from .concept_cap_multilingual_dataset import ConceptCapMultilingualLoaderTrain, ConceptCapMultilingualLoaderVal
 from .concept_cap_vtlm_dataset import ConceptCapVTLM_LoaderTrain
-from .concept_cap_tlm_dataset import ConceptCapTLM_LoaderTrain
+
 
 # from .vqa_dataset import VQAClassificationDataset
 from .nlvr2_dataset import NLVR2Dataset, NLVR2Loader

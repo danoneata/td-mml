@@ -451,7 +451,8 @@ def LoadDatasetEval(args, config, task_cfg, task_id):
     features_reader1 = ImageFeaturesH5Reader(feats_h5path1, config, args.in_memory) if feats_h5path1 != "" else None
     features_reader2 = ImageFeaturesH5Reader(feats_h5path2, config, args.in_memory) if feats_h5path2 != "" else None
 
-    batch_size = task_cfg[task].get("eval_batch_size", args.batch_size)
+    batch_size = args.batch_size or task_cfg[task].get("eval_batch_size", args.batch_size)
+    # batch_size = task_cfg[task].get("eval_batch_size", args.batch_size)
     if args.local_rank != -1:
         batch_size = int(batch_size / dist.get_world_size())
 

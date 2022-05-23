@@ -35,8 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 LANGS = "af am ar az be bg bn br bs ca cs cy da de el en es et fa fi fr fy ga gd gl gu ha he hi hr hu hy id is it ja jv ka kk km kn ko lo lt lv mg mk ml mn mr ms my ne nl no or pa pl ps pt ro ru sd si sk sl so sq sr su sv sw ta th tl tr uk ur uz vi xh yi zh"
-# LANGS = LANGS.split()  # type: List[str]
-
+LANGS = LANGS.split()  # type: List[str]
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -172,7 +171,7 @@ def main():
         torch.cuda.manual_seed_all(args.seed)
 
     if not isinstance(args.langs, list):
-        args.langs = args.langs.split()
+        args.langs = args.langs.split('-')
     logger.info(f"pretrain langs: {args.langs}")
     # Datasets
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
