@@ -24,6 +24,9 @@ from volta.encoders import BertForVLPreTraining
 from volta.datasets import ConceptCapMultilingualLoaderTrain, ConceptCapMultilingualLoaderVal, ConceptCapVTLM_LoaderTrain
 from volta.train_utils import freeze_layers, tbLogger, summary_parameters, save, resume
 
+from volta.datasets._captions_reader import MultilingualCaptionReader
+
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 logging.basicConfig(
@@ -177,13 +180,16 @@ def main():
     # Datasets
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
 
+    captions_load = MultilingualCaptionReader(caption_path=args.annotations_path, split='train',langs=args.langs)
+
     train_vtlm_dataset = ConceptCapVTLM_LoaderTrain(
         args.annotations_path, args.features_path, tokenizer, args.bert_model,
         seq_len=args.max_seq_length, langs=args.langs,
         langs_sampling_path=args.langs_sampling_path, batch_size=args.train_batch_size//2,
         num_workers=args.num_workers, local_rank=args.local_rank,
         objective=args.objective, tokenizer_name=args.bert_model, cache=cache,
-        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs)
+        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs,
+        captions=captions_load.captions)
 
     lmdb_file = train_vtlm_dataset.lmdb_file
 
@@ -193,7 +199,8 @@ def main():
         langs_sampling_path=args.langs_sampling_path, batch_size=args.train_batch_size,
         num_workers=args.num_workers, local_rank=args.local_rank,
         objective=args.objective, tokenizer_name=args.bert_model, cache=cache,
-        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs, lmdb_file=lmdb_file)
+        add_global_imgfeat=config.add_global_imgfeat, num_locs=config.num_locs,
+        lmdb_file=lmdb_file,captions=captions_load.captions)
     # valid_dataset = ConceptCapMultilingualLoaderVal(
     #     args.annotations_path, args.features_path, tokenizer, args.bert_model,
     #     seq_len=args.max_seq_length, langs=args.langs, batch_size=args.train_batch_size, num_workers=2,

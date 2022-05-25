@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=20lg-vtlm-pretrain-cc
-#SBATCH --ntasks=1 --cpus-per-task=20 --mem=115GB
-#SBATCH -p gpu --gres=gpu:titanx:4
+#SBATCH --ntasks=1 --cpus-per-task=40 --mem=110GB
+#SBATCH -p gpu --gres=gpu:titanx:3
 #SBATCH --time=5:00:00
 #SBATCH --output="pretrain-cc.multilingual.vtlm-random_lg.log"
 

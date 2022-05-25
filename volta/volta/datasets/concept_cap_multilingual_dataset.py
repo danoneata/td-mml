@@ -70,7 +70,8 @@ class ConceptCapMultilingualLoaderTrain(ConceptCapLoaderTrain):
         num_locs=5,
         add_global_imgfeat=None,
         tokenizer_name="bert-base-uncased",
-        lmdb_file = None
+        lmdb_file = None,
+        captions= None
     ):
         if lmdb_file is None:
             if dist.is_available() and local_rank != -1:
@@ -100,6 +101,7 @@ class ConceptCapMultilingualLoaderTrain(ConceptCapLoaderTrain):
             num_locs=num_locs,
             tokenizer_name=tokenizer_name,
             split="train",
+            captions=captions
         )
 
         ds = td.PrefetchData(ds, 16, 1)
@@ -154,6 +156,7 @@ class ConceptCapMultilingualLoaderVal(ConceptCapLoaderVal):
             add_global_imgfeat=True,
             tokenizer_name="bert-base-uncased",
             visualization=False,
+            captions= None
     ):
         lmdb_file = os.path.join(features_path, "validation_feat_all.lmdb")
         print("Loading from %s" % lmdb_file)
@@ -174,6 +177,7 @@ class ConceptCapMultilingualLoaderVal(ConceptCapLoaderVal):
             num_locs=num_locs,
             tokenizer_name=tokenizer_name,
             split="valid",
+            captions=captions
         )
 
         ds = td.MapData(ds, preprocess_function)
@@ -202,6 +206,7 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
             objective=0,
             num_locs=5,
             tokenizer_name="bert-base-uncased",
+            captions= None
     ):
 
         self.split = split
@@ -210,7 +215,9 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         self.tokenizer = tokenizer
         self.num_caps = data_size
         self.langs = langs
-        self.captions = self.load_captions(caption_path, split, self.langs)
+        self.captions = captions
+        if self.captions is None:
+            self.captions = self.load_captions(caption_path, split, self.langs)
         self.visualization = visualization
         self.objective = objective
         self.bert_model = bert_model
@@ -244,13 +251,11 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
         else:
             # Pick the correpsonding caption of the current image from a random
             # language for which we have the translation.
-
             lang = self.sample_language(image_id)
             caption = self.captions[lang][image_id]
             label = 0
 
         return caption, label
-
 
 # Functions used for language sampling
 

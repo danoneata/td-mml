@@ -149,6 +149,7 @@ class ConceptCapVTLM_LoaderTrain(Dataset):
         num_locs=5,
         add_global_imgfeat=None,
         tokenizer_name="bert-base-uncased",
+        captions = None
     ):
 
         if dist.is_available() and local_rank != -1:
@@ -181,6 +182,7 @@ class ConceptCapVTLM_LoaderTrain(Dataset):
             num_locs=num_locs,
             tokenizer_name=tokenizer_name,
             split="train",
+            captions = captions
         )
 
         ds = td.PrefetchData(ds, 16, 1)
@@ -344,6 +346,7 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
             objective=0,
             num_locs=5,
             tokenizer_name="bert-base-uncased",
+            captions =None
     ):
 
         self.split = split
@@ -352,7 +355,9 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
         self.tokenizer = tokenizer
         self.num_caps = data_size
         self.langs = langs
-        self.captions = self.load_captions(caption_path, split, self.langs)
+        self.captions = captions
+        if self.captions is None:
+            self.captions = self.load_captions(caption_path, split, self.langs)
         self.visualization = visualization
         self.objective = objective
         self.bert_model = bert_model
