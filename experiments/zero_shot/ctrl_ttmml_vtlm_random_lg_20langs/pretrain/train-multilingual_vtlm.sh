@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=20lg-sample-pretrain-cc
-#SBATCH --ntasks=1 --cpus-per-task=20 --mem=60GB
-#SBATCH -p gpu --gres=gpu:titanrtx:2
-#SBATCH --time=3-12:30:00
-#SBATCH --output="pretrain-cc.multilingual.sample-lg.20langs.log"
+#SBATCH --job-name=20lg-vtlm-pretrain-cc
+#SBATCH --ntasks=1 --cpus-per-task=40 --mem=60GB
+#SBATCH -p gpu --gres=gpu:titanx:3
+#SBATCH --time=5-16:30:00
+#SBATCH --output="pretrain-cc.multilingual.vtlm-random_lg.log"
 
 LANGS=20
 LANGS_SET=ar-bg-bn-da-de-el-en-es-et-fr-id-ja-ko-pt-ru-sw-ta-tr-vi-zh
@@ -14,10 +14,9 @@ ANNOS=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/m2m-100-lg-filter
 MODEL_CONFIG=ctrl_xuniter_base
 
 LANG_SAMPLING=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/p-lang-and-sent-alpha-0.3.npz
-STRATEGY=sample_lg
+STRATEGY=vtlm
 TRAIN_BATCH_SIZE=256
 WARMUP_Proportion=0.05
-
 
 echo "train_batch_size":$TRAIN_BATCH_SIZE
 echo "strategy":$STRATEGY
@@ -31,7 +30,7 @@ source /science/image/nlp-datasets/tt-mml/envs/tt-mml/bin/activate
 
 cd ../../../../volta
 
-python train_concap_multilingual.py \
+python train_concap_ttmml.py \
   --bert_model xlm-roberta-base \
   --from_pretrained xlm-roberta-base \
   --config_file config/${MODEL_CONFIG}.json \
@@ -45,10 +44,9 @@ python train_concap_multilingual.py \
   --output_dir $OUTPUT_DIR \
   --logdir $LOGGING_DIR \
   --num_train_epochs 20 \
-  --langs_sampling_path $LANG_SAMPLING \
+  --langs_sampling_path "" \
   --save_every_n_steps 10000 \
   --langs $LANGS_SET \
   --num_workers 5
-  # --num_workers 0  # For debugging purposes
 
 deactivate

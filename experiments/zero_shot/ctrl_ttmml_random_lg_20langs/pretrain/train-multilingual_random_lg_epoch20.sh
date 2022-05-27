@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=20lg-sample-pretrain-cc
+#SBATCH --job-name=20lg-random-pretrain-cc
 #SBATCH --ntasks=1 --cpus-per-task=20 --mem=60GB
 #SBATCH -p gpu --gres=gpu:titanrtx:2
 #SBATCH --time=3-12:30:00
-#SBATCH --output="pretrain-cc.multilingual.sample-lg.20langs.log"
+#SBATCH --output="pretrain-cc.multilingual.random-lg.ptr-20langs.epoch20.log"
 
 LANGS=20
 LANGS_SET=ar-bg-bn-da-de-el-en-es-et-fr-id-ja-ko-pt-ru-sw-ta-tr-vi-zh
@@ -13,17 +13,15 @@ FEATS=$DATA/resnet101_faster_rcnn_genome_imgfeats/volta
 ANNOS=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/m2m-100-lg-filtered
 MODEL_CONFIG=ctrl_xuniter_base
 
-LANG_SAMPLING=$DIR/data/conceptual_captions/annotations/langs_${LANGS}/p-lang-and-sent-alpha-0.3.npz
-STRATEGY=sample_lg
+STRATEGY=random_lg
 TRAIN_BATCH_SIZE=256
 WARMUP_Proportion=0.05
 
-
 echo "train_batch_size":$TRAIN_BATCH_SIZE
 echo "strategy":$STRATEGY
-echo "pretrain langs":$LANGS
+echo "epochs=20"
 
-TETASK=conceptual_captions-${STRATEGY}
+TETASK=conceptual_captions-${STRATEGY}-epoch20
 OUTPUT_DIR=$DIR/checkpoints/iglue/pretrain/ctrl_ttmml_${STRATEGY}_${LANGS}langs/${MODEL_CONFIG}/train_batch_size_${TRAIN_BATCH_SIZE}/${TETASK}
 LOGGING_DIR=$DIR/logs/pretrain/ctrl_ttmml_${STRATEGY}_${LANGS}langs/${MODEL_CONFIG}/train_batch_size_${TRAIN_BATCH_SIZE}/${TETASK}
 
@@ -45,7 +43,7 @@ python train_concap_multilingual.py \
   --output_dir $OUTPUT_DIR \
   --logdir $LOGGING_DIR \
   --num_train_epochs 20 \
-  --langs_sampling_path $LANG_SAMPLING \
+  --langs_sampling_path "" \
   --save_every_n_steps 10000 \
   --langs $LANGS_SET \
   --num_workers 5

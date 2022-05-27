@@ -1,0 +1,591 @@
+train_batch_size:256
+strategy:vtlm
+pretrain langs:20
+WARNING:tensorflow:From /home/mwp141/anaconda3/envs/chenQA/lib/python3.6/site-packages/tensorpack/callbacks/hooks.py:17: The name tf.train.SessionRunHook is deprecated. Please use tf.estimator.SessionRunHook instead.
+
+WARNING:tensorflow:From /home/mwp141/anaconda3/envs/chenQA/lib/python3.6/site-packages/tensorpack/tfutils/optimizer.py:18: The name tf.train.Optimizer is deprecated. Please use tf.compat.v1.train.Optimizer instead.
+
+WARNING:tensorflow:From /home/mwp141/anaconda3/envs/chenQA/lib/python3.6/site-packages/tensorpack/tfutils/sesscreate.py:20: The name tf.train.SessionCreator is deprecated. Please use tf.compat.v1.train.SessionCreator instead.
+
+05/27/2022 03:23:19 - INFO - __main__ -   device: cuda n_gpu: 3, distributed training: False
+05/27/2022 03:23:19 - INFO - __main__ -   pretrain langs: ['ar', 'bg', 'bn', 'da', 'de', 'el', 'en', 'es', 'et', 'fr', 'id', 'ja', 'ko', 'pt', 'ru', 'sw', 'ta', 'tr', 'vi', 'zh']
+Loading from /science/image/nlp-datasets/emanuele/data/conceptual_captions/resnet101_faster_rcnn_genome_imgfeats/volta/training_feat_all.lmdb
+[32m[0527 03:25:08 @format.py:92][0m Found 2777649 entries in /science/image/nlp-datasets/emanuele/data/conceptual_captions/resnet101_faster_rcnn_genome_imgfeats/volta/training_feat_all.lmdb
+05/27/2022 03:25:08 - INFO - volta.datasets.concept_cap_vtlm_dataset -     sample_language = <volta.datasets.concept_cap_vtlm_dataset.LanguageSamplingDefault object at 0x7f027b66beb8>
+[32m[0527 03:25:08 @parallel.py:309][0m [PrefetchDataZMQ] Will fork a dataflow more than one times. This assumes the datapoints are i.i.d.
+[32m[0527 03:25:08 @argtools.py:146][0m [5m[31mWRN[0m "import prctl" failed! Install python-prctl so that processes can be cleaned with guarantee.
+[32m[0527 03:25:08 @argtools.py:146][0m [5m[31mWRN[0m "import prctl" failed! Install python-prctl so that processes can be cleaned with guarantee.
+[32m[0527 03:25:09 @parallel.py:309][0m [PrefetchDataZMQ] Will fork a dataflow more than one times. This assumes the datapoints are i.i.d.
+[32m[0527 03:25:09 @argtools.py:146][0m [5m[31mWRN[0m "import prctl" failed! Install python-prctl so that processes can be cleaned with guarantee.
+[32m[0527 03:25:09 @argtools.py:146][0m [5m[31mWRN[0m "import prctl" failed! Install python-prctl so that processes can be cleaned with guarantee.
+05/27/2022 03:25:10 - INFO - volta.train_utils -   logging file at: /science/image/nlp-datasets/tt-mml/logs/pretrain/ctrl_ttmml_vtlm_20langs/ctrl_xuniter_base/train_batch_size_256/conceptual_captions-vtlm/ctrl_xuniter_base
+05/27/2022 03:25:15 - INFO - volta.utils -   loading weights file https://s3.amazonaws.com/models.huggingface.co/bert/xlm-roberta-base-pytorch_model.bin from cache at /home/mwp141/.pytorch_pretrained_bert/f80a708b21cc9b248e8af5a630ad9f887326bbaf0098b9f354427b2463d55346.aeeaca90954dc20ffa2909de722cfbfd455c5bb16d480c5bdf6d7fe79c68c267
+05/27/2022 03:25:43 - INFO - volta.utils -   
+05/27/2022 03:25:43 - INFO - volta.utils -   Weights of BertForVLPreTraining not initialized from pretrained model: ['bert.embeddings.token_type_embeddings_2_dims.weight', 'bert.embeddings.image_embeddings.weight', 'bert.embeddings.image_embeddings.bias', 'bert.embeddings.image_location_embeddings.weight', 'bert.embeddings.image_location_embeddings.bias', 'bert.embeddings.image_token_type_embeddings.weight', 'bert.embeddings.image_layer_norm.weight', 'bert.embeddings.image_layer_norm.bias', 'bert.embeddings.image_location_layer_norm.weight', 'bert.embeddings.image_location_layer_norm.bias', 'bert.embeddings.v_LayerNorm.weight', 'bert.embeddings.v_LayerNorm.bias', 'bert.encoder.layer.0.attention_self.v_query.weight', 'bert.encoder.layer.0.attention_self.v_query.bias', 'bert.encoder.layer.0.attention_self.v_key.weight', 'bert.encoder.layer.0.attention_self.v_key.bias', 'bert.encoder.layer.0.attention_self.v_value.weight', 'bert.encoder.layer.0.attention_self.v_value.bias', 'bert.encoder.layer.0.attention_output.v_dense.weight', 'bert.encoder.layer.0.attention_output.v_dense.bias', 'bert.encoder.layer.0.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.0.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.1.intermediate.v_dense.weight', 'bert.encoder.layer.1.intermediate.v_dense.bias', 'bert.encoder.layer.1.output.v_dense.weight', 'bert.encoder.layer.1.output.v_dense.bias', 'bert.encoder.layer.1.output.v_LayerNorm.weight', 'bert.encoder.layer.1.output.v_LayerNorm.bias', 'bert.encoder.layer.2.attention_self.v_query.weight', 'bert.encoder.layer.2.attention_self.v_query.bias', 'bert.encoder.layer.2.attention_self.v_key.weight', 'bert.encoder.layer.2.attention_self.v_key.bias', 'bert.encoder.layer.2.attention_self.v_value.weight', 'bert.encoder.layer.2.attention_self.v_value.bias', 'bert.encoder.layer.2.attention_output.v_dense.weight', 'bert.encoder.layer.2.attention_output.v_dense.bias', 'bert.encoder.layer.2.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.2.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.3.intermediate.v_dense.weight', 'bert.encoder.layer.3.intermediate.v_dense.bias', 'bert.encoder.layer.3.output.v_dense.weight', 'bert.encoder.layer.3.output.v_dense.bias', 'bert.encoder.layer.3.output.v_LayerNorm.weight', 'bert.encoder.layer.3.output.v_LayerNorm.bias', 'bert.encoder.layer.4.attention_self.v_query.weight', 'bert.encoder.layer.4.attention_self.v_query.bias', 'bert.encoder.layer.4.attention_self.v_key.weight', 'bert.encoder.layer.4.attention_self.v_key.bias', 'bert.encoder.layer.4.attention_self.v_value.weight', 'bert.encoder.layer.4.attention_self.v_value.bias', 'bert.encoder.layer.4.attention_output.v_dense.weight', 'bert.encoder.layer.4.attention_output.v_dense.bias', 'bert.encoder.layer.4.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.4.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.5.intermediate.v_dense.weight', 'bert.encoder.layer.5.intermediate.v_dense.bias', 'bert.encoder.layer.5.output.v_dense.weight', 'bert.encoder.layer.5.output.v_dense.bias', 'bert.encoder.layer.5.output.v_LayerNorm.weight', 'bert.encoder.layer.5.output.v_LayerNorm.bias', 'bert.encoder.layer.6.attention_self.v_query.weight', 'bert.encoder.layer.6.attention_self.v_query.bias', 'bert.encoder.layer.6.attention_self.v_key.weight', 'bert.encoder.layer.6.attention_self.v_key.bias', 'bert.encoder.layer.6.attention_self.v_value.weight', 'bert.encoder.layer.6.attention_self.v_value.bias', 'bert.encoder.layer.6.attention_output.v_dense.weight', 'bert.encoder.layer.6.attention_output.v_dense.bias', 'bert.encoder.layer.6.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.6.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.7.intermediate.v_dense.weight', 'bert.encoder.layer.7.intermediate.v_dense.bias', 'bert.encoder.layer.7.output.v_dense.weight', 'bert.encoder.layer.7.output.v_dense.bias', 'bert.encoder.layer.7.output.v_LayerNorm.weight', 'bert.encoder.layer.7.output.v_LayerNorm.bias', 'bert.encoder.layer.8.attention_self.v_query.weight', 'bert.encoder.layer.8.attention_self.v_query.bias', 'bert.encoder.layer.8.attention_self.v_key.weight', 'bert.encoder.layer.8.attention_self.v_key.bias', 'bert.encoder.layer.8.attention_self.v_value.weight', 'bert.encoder.layer.8.attention_self.v_value.bias', 'bert.encoder.layer.8.attention_output.v_dense.weight', 'bert.encoder.layer.8.attention_output.v_dense.bias', 'bert.encoder.layer.8.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.8.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.9.intermediate.v_dense.weight', 'bert.encoder.layer.9.intermediate.v_dense.bias', 'bert.encoder.layer.9.output.v_dense.weight', 'bert.encoder.layer.9.output.v_dense.bias', 'bert.encoder.layer.9.output.v_LayerNorm.weight', 'bert.encoder.layer.9.output.v_LayerNorm.bias', 'bert.encoder.layer.10.attention_self.v_query.weight', 'bert.encoder.layer.10.attention_self.v_query.bias', 'bert.encoder.layer.10.attention_self.v_key.weight', 'bert.encoder.layer.10.attention_self.v_key.bias', 'bert.encoder.layer.10.attention_self.v_value.weight', 'bert.encoder.layer.10.attention_self.v_value.bias', 'bert.encoder.layer.10.attention_output.v_dense.weight', 'bert.encoder.layer.10.attention_output.v_dense.bias', 'bert.encoder.layer.10.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.10.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.11.intermediate.v_dense.weight', 'bert.encoder.layer.11.intermediate.v_dense.bias', 'bert.encoder.layer.11.output.v_dense.weight', 'bert.encoder.layer.11.output.v_dense.bias', 'bert.encoder.layer.11.output.v_LayerNorm.weight', 'bert.encoder.layer.11.output.v_LayerNorm.bias', 'bert.encoder.layer.12.attention_self.v_query.weight', 'bert.encoder.layer.12.attention_self.v_query.bias', 'bert.encoder.layer.12.attention_self.v_key.weight', 'bert.encoder.layer.12.attention_self.v_key.bias', 'bert.encoder.layer.12.attention_self.v_value.weight', 'bert.encoder.layer.12.attention_self.v_value.bias', 'bert.encoder.layer.12.attention_output.v_dense.weight', 'bert.encoder.layer.12.attention_output.v_dense.bias', 'bert.encoder.layer.12.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.12.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.13.intermediate.v_dense.weight', 'bert.encoder.layer.13.intermediate.v_dense.bias', 'bert.encoder.layer.13.output.v_dense.weight', 'bert.encoder.layer.13.output.v_dense.bias', 'bert.encoder.layer.13.output.v_LayerNorm.weight', 'bert.encoder.layer.13.output.v_LayerNorm.bias', 'bert.encoder.layer.14.attention_self.v_query.weight', 'bert.encoder.layer.14.attention_self.v_query.bias', 'bert.encoder.layer.14.attention_self.v_key.weight', 'bert.encoder.layer.14.attention_self.v_key.bias', 'bert.encoder.layer.14.attention_self.v_value.weight', 'bert.encoder.layer.14.attention_self.v_value.bias', 'bert.encoder.layer.14.attention_output.v_dense.weight', 'bert.encoder.layer.14.attention_output.v_dense.bias', 'bert.encoder.layer.14.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.14.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.15.intermediate.v_dense.weight', 'bert.encoder.layer.15.intermediate.v_dense.bias', 'bert.encoder.layer.15.output.v_dense.weight', 'bert.encoder.layer.15.output.v_dense.bias', 'bert.encoder.layer.15.output.v_LayerNorm.weight', 'bert.encoder.layer.15.output.v_LayerNorm.bias', 'bert.encoder.layer.16.attention_self.v_query.weight', 'bert.encoder.layer.16.attention_self.v_query.bias', 'bert.encoder.layer.16.attention_self.v_key.weight', 'bert.encoder.layer.16.attention_self.v_key.bias', 'bert.encoder.layer.16.attention_self.v_value.weight', 'bert.encoder.layer.16.attention_self.v_value.bias', 'bert.encoder.layer.16.attention_output.v_dense.weight', 'bert.encoder.layer.16.attention_output.v_dense.bias', 'bert.encoder.layer.16.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.16.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.17.intermediate.v_dense.weight', 'bert.encoder.layer.17.intermediate.v_dense.bias', 'bert.encoder.layer.17.output.v_dense.weight', 'bert.encoder.layer.17.output.v_dense.bias', 'bert.encoder.layer.17.output.v_LayerNorm.weight', 'bert.encoder.layer.17.output.v_LayerNorm.bias', 'bert.encoder.layer.18.attention_self.v_query.weight', 'bert.encoder.layer.18.attention_self.v_query.bias', 'bert.encoder.layer.18.attention_self.v_key.weight', 'bert.encoder.layer.18.attention_self.v_key.bias', 'bert.encoder.layer.18.attention_self.v_value.weight', 'bert.encoder.layer.18.attention_self.v_value.bias', 'bert.encoder.layer.18.attention_output.v_dense.weight', 'bert.encoder.layer.18.attention_output.v_dense.bias', 'bert.encoder.layer.18.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.18.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.19.intermediate.v_dense.weight', 'bert.encoder.layer.19.intermediate.v_dense.bias', 'bert.encoder.layer.19.output.v_dense.weight', 'bert.encoder.layer.19.output.v_dense.bias', 'bert.encoder.layer.19.output.v_LayerNorm.weight', 'bert.encoder.layer.19.output.v_LayerNorm.bias', 'bert.encoder.layer.20.attention_self.v_query.weight', 'bert.encoder.layer.20.attention_self.v_query.bias', 'bert.encoder.layer.20.attention_self.v_key.weight', 'bert.encoder.layer.20.attention_self.v_key.bias', 'bert.encoder.layer.20.attention_self.v_value.weight', 'bert.encoder.layer.20.attention_self.v_value.bias', 'bert.encoder.layer.20.attention_output.v_dense.weight', 'bert.encoder.layer.20.attention_output.v_dense.bias', 'bert.encoder.layer.20.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.20.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.21.intermediate.v_dense.weight', 'bert.encoder.layer.21.intermediate.v_dense.bias', 'bert.encoder.layer.21.output.v_dense.weight', 'bert.encoder.layer.21.output.v_dense.bias', 'bert.encoder.layer.21.output.v_LayerNorm.weight', 'bert.encoder.layer.21.output.v_LayerNorm.bias', 'bert.encoder.layer.22.attention_self.v_query.weight', 'bert.encoder.layer.22.attention_self.v_query.bias', 'bert.encoder.layer.22.attention_self.v_key.weight', 'bert.encoder.layer.22.attention_self.v_key.bias', 'bert.encoder.layer.22.attention_self.v_value.weight', 'bert.encoder.layer.22.attention_self.v_value.bias', 'bert.encoder.layer.22.attention_output.v_dense.weight', 'bert.encoder.layer.22.attention_output.v_dense.bias', 'bert.encoder.layer.22.attention_output.v_LayerNorm.weight', 'bert.encoder.layer.22.attention_output.v_LayerNorm.bias', 'bert.encoder.layer.23.intermediate.v_dense.weight', 'bert.encoder.layer.23.intermediate.v_dense.bias', 'bert.encoder.layer.23.output.v_dense.weight', 'bert.encoder.layer.23.output.v_dense.bias', 'bert.encoder.layer.23.output.v_LayerNorm.weight', 'bert.encoder.layer.23.output.v_LayerNorm.bias', 'bert.t_pooler.dense.weight', 'bert.t_pooler.dense.bias', 'bert.v_pooler.dense.weight', 'bert.v_pooler.dense.bias', 'cls.bi_seq_relationship.weight', 'cls.bi_seq_relationship.bias', 'cls.imagePredictions.transform.dense.weight', 'cls.imagePredictions.transform.dense.bias', 'cls.imagePredictions.transform.LayerNorm.weight', 'cls.imagePredictions.transform.LayerNorm.bias', 'cls.imagePredictions.decoder_dict.0.weight', 'cls.imagePredictions.decoder_dict.0.bias']
+05/27/2022 03:25:43 - INFO - volta.utils -   Weights from pretrained model not used in BertForVLPreTraining: ['bert.pooler.dense.weight', 'bert.pooler.dense.bias']
+05/27/2022 03:25:59 - INFO - __main__ -   ** ** * Saving model * ** ** 
+05/27/2022 03:26:21 - INFO - __main__ -   >> Parameters:
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |Name                                                              |Dtype            |Shape            |#Params      |Trainable|
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.word_embeddings.weight                     |torch.float32    |(250002, 768)    |192001536    |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.position_embeddings.weight                 |torch.float32    |(514, 768)       |394752       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.token_type_embeddings.weight               |torch.float32    |(1, 768)         |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.token_type_embeddings_2_dims.weight        |torch.float32    |(2, 768)         |1536         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.LayerNorm.weight                           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.LayerNorm.bias                             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_embeddings.weight                    |torch.float32    |(768, 2048)      |1572864      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_embeddings.bias                      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_location_embeddings.weight           |torch.float32    |(768, 5)         |3840         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_location_embeddings.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_token_type_embeddings.weight         |torch.float32    |(1, 768)         |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_layer_norm.weight                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_layer_norm.bias                      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_location_layer_norm.weight           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.image_location_layer_norm.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.v_LayerNorm.weight                         |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.embeddings.v_LayerNorm.bias                           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_self.query.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_self.query.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_self.key.weight             |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_self.key.bias               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_self.value.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_self.value.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_output.dense.weight         |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_output.dense.bias           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_output.LayerNorm.weight     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.0.attention_output.LayerNorm.bias       |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.1.intermediate.dense.weight             |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.1.intermediate.dense.bias               |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.1.output.dense.weight                   |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.1.output.dense.bias                     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.1.output.LayerNorm.weight               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.1.output.LayerNorm.bias                 |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_self.query.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_self.query.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_self.key.weight             |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_self.key.bias               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_self.value.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_self.value.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_output.dense.weight         |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_output.dense.bias           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_output.LayerNorm.weight     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.2.attention_output.LayerNorm.bias       |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.3.intermediate.dense.weight             |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.3.intermediate.dense.bias               |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.3.output.dense.weight                   |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.3.output.dense.bias                     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.3.output.LayerNorm.weight               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.3.output.LayerNorm.bias                 |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_self.query.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_self.query.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_self.key.weight             |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_self.key.bias               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_self.value.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_self.value.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_output.dense.weight         |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_output.dense.bias           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_output.LayerNorm.weight     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.4.attention_output.LayerNorm.bias       |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.5.intermediate.dense.weight             |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.5.intermediate.dense.bias               |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.5.output.dense.weight                   |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.5.output.dense.bias                     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.5.output.LayerNorm.weight               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.5.output.LayerNorm.bias                 |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_self.query.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_self.query.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_self.key.weight             |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_self.key.bias               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_self.value.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_self.value.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_output.dense.weight         |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_output.dense.bias           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_output.LayerNorm.weight     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.6.attention_output.LayerNorm.bias       |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.7.intermediate.dense.weight             |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.7.intermediate.dense.bias               |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.7.output.dense.weight                   |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.7.output.dense.bias                     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.7.output.LayerNorm.weight               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.7.output.LayerNorm.bias                 |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_self.query.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_self.query.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_self.key.weight             |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_self.key.bias               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_self.value.weight           |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_self.value.bias             |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_output.dense.weight         |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_output.dense.bias           |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_output.LayerNorm.weight     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.8.attention_output.LayerNorm.bias       |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.9.intermediate.dense.weight             |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.9.intermediate.dense.bias               |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.9.output.dense.weight                   |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.9.output.dense.bias                     |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.9.output.LayerNorm.weight               |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.9.output.LayerNorm.bias                 |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_self.query.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_self.query.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_self.key.weight            |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_self.key.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_self.value.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_self.value.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_output.dense.weight        |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_output.dense.bias          |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_output.LayerNorm.weight    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.10.attention_output.LayerNorm.bias      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.11.intermediate.dense.weight            |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.11.intermediate.dense.bias              |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.11.output.dense.weight                  |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.11.output.dense.bias                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.11.output.LayerNorm.weight              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.11.output.LayerNorm.bias                |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_self.query.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_self.query.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_self.key.weight            |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_self.key.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_self.value.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_self.value.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_output.dense.weight        |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_output.dense.bias          |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_output.LayerNorm.weight    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.12.attention_output.LayerNorm.bias      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.13.intermediate.dense.weight            |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.13.intermediate.dense.bias              |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.13.output.dense.weight                  |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.13.output.dense.bias                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.13.output.LayerNorm.weight              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.13.output.LayerNorm.bias                |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_self.query.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_self.query.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_self.key.weight            |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_self.key.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_self.value.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_self.value.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_output.dense.weight        |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_output.dense.bias          |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_output.LayerNorm.weight    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.14.attention_output.LayerNorm.bias      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.15.intermediate.dense.weight            |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.15.intermediate.dense.bias              |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.15.output.dense.weight                  |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.15.output.dense.bias                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.15.output.LayerNorm.weight              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.15.output.LayerNorm.bias                |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_self.query.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_self.query.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_self.key.weight            |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_self.key.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_self.value.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_self.value.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_output.dense.weight        |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_output.dense.bias          |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_output.LayerNorm.weight    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.16.attention_output.LayerNorm.bias      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.17.intermediate.dense.weight            |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.17.intermediate.dense.bias              |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.17.output.dense.weight                  |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.17.output.dense.bias                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.17.output.LayerNorm.weight              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.17.output.LayerNorm.bias                |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_self.query.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_self.query.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_self.key.weight            |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_self.key.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_self.value.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_self.value.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_output.dense.weight        |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_output.dense.bias          |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_output.LayerNorm.weight    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.18.attention_output.LayerNorm.bias      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.19.intermediate.dense.weight            |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.19.intermediate.dense.bias              |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.19.output.dense.weight                  |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.19.output.dense.bias                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.19.output.LayerNorm.weight              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.19.output.LayerNorm.bias                |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_self.query.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_self.query.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_self.key.weight            |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_self.key.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_self.value.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_self.value.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_output.dense.weight        |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_output.dense.bias          |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_output.LayerNorm.weight    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.20.attention_output.LayerNorm.bias      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.21.intermediate.dense.weight            |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.21.intermediate.dense.bias              |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.21.output.dense.weight                  |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.21.output.dense.bias                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.21.output.LayerNorm.weight              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.21.output.LayerNorm.bias                |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_self.query.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_self.query.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_self.key.weight            |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_self.key.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_self.value.weight          |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_self.value.bias            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_output.dense.weight        |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_output.dense.bias          |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_output.LayerNorm.weight    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.22.attention_output.LayerNorm.bias      |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.23.intermediate.dense.weight            |torch.float32    |(3072, 768)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.23.intermediate.dense.bias              |torch.float32    |(3072,)          |3072         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.23.output.dense.weight                  |torch.float32    |(768, 3072)      |2359296      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.23.output.dense.bias                    |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.23.output.LayerNorm.weight              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.encoder.layer.23.output.LayerNorm.bias                |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.t_pooler.dense.weight                                 |torch.float32    |(1024, 768)      |786432       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.t_pooler.dense.bias                                   |torch.float32    |(1024,)          |1024         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.v_pooler.dense.weight                                 |torch.float32    |(1024, 768)      |786432       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.bert.v_pooler.dense.bias                                   |torch.float32    |(1024,)          |1024         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.predictions.bias                                       |torch.float32    |(250002,)        |250002       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.predictions.transform.dense.weight                     |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.predictions.transform.dense.bias                       |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.predictions.transform.LayerNorm.weight                 |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.predictions.transform.LayerNorm.bias                   |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.bi_seq_relationship.weight                             |torch.float32    |(2, 1024)        |2048         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.bi_seq_relationship.bias                               |torch.float32    |(2,)             |2            |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.imagePredictions.transform.dense.weight                |torch.float32    |(768, 768)       |589824       |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.imagePredictions.transform.dense.bias                  |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.imagePredictions.transform.LayerNorm.weight            |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.imagePredictions.transform.LayerNorm.bias              |torch.float32    |(768,)           |768          |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.imagePredictions.decoder_dict.0.weight                 |torch.float32    |(1601, 768)      |1229568      |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   |module.cls.imagePredictions.decoder_dict.0.bias                   |torch.float32    |(1601,)          |1601         |True    |
+05/27/2022 03:26:21 - INFO - __main__ -   -------------------------------------------------------------------------------------------------------------------------------
+05/27/2022 03:26:21 - INFO - __main__ -   >> # TrainableParams:       	283.28	M
+05/27/2022 03:26:21 - INFO - __main__ -   >> # NonTrainableParams:    	0.00	M
+05/27/2022 03:26:21 - INFO - __main__ -   >> # TotalParams:           	283.28	M
+05/27/2022 03:26:21 - INFO - __main__ -   ***** Running training *****
+05/27/2022 03:26:21 - INFO - __main__ -     Num examples = 2777649
+05/27/2022 03:26:21 - INFO - __main__ -     Batch size = 64
+05/27/2022 03:26:21 - INFO - __main__ -     Num steps = 108500
+05/27/2022 03:26:34 - INFO - __main__ -   The CPU usage is 2.900000: 
+05/27/2022 03:26:34 - INFO - __main__ -   The RAM memory is 50.200000 used: 
+/home/mwp141/anaconda3/envs/chenQA/lib/python3.6/site-packages/pytorch_transformers/optimization.py:166: UserWarning: This overload of add_ is deprecated:
+	add_(Number alpha, Tensor other)
+Consider using one of the following signatures instead:
+	add_(Tensor other, *, Number alpha) (Triggered internally at  /pytorch/torch/csrc/utils/python_arg_parser.cpp:1005.)
+  exp_avg.mul_(beta1).add_(1.0 - beta1, grad)
+05/27/2022 03:26:42 - INFO - __main__ -   The CPU usage is 2.800000: 
+05/27/2022 03:26:42 - INFO - __main__ -   The RAM memory is 50.200000 used: 
+05/27/2022 03:26:43 - INFO - __main__ -     runs in vtlm step and loss =8.000000 2.609344
+05/27/2022 03:26:43 - INFO - __main__ -     runs in vtlm step and loss =8.000000 2.512020
+05/27/2022 03:26:44 - INFO - __main__ -     runs in vtlm step and loss =8.000000 2.401009
+05/27/2022 03:26:45 - INFO - __main__ -     runs in vtlm step and loss =8.000000 2.755374
+05/27/2022 03:26:53 - INFO - __main__ -   The CPU usage is 1.800000: 
+05/27/2022 03:26:53 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:01 - INFO - __main__ -   The CPU usage is 2.500000: 
+05/27/2022 03:27:01 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:02 - INFO - __main__ -     runs in vtlm step and loss =16.000000 2.562252
+05/27/2022 03:27:02 - INFO - __main__ -     runs in vtlm step and loss =16.000000 2.770358
+05/27/2022 03:27:03 - INFO - __main__ -     runs in vtlm step and loss =16.000000 2.439757
+05/27/2022 03:27:04 - INFO - __main__ -     runs in vtlm step and loss =16.000000 2.600625
+05/27/2022 03:27:12 - INFO - __main__ -   The CPU usage is 1.100000: 
+05/27/2022 03:27:12 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:20 - INFO - __main__ -   The CPU usage is 1.300000: 
+05/27/2022 03:27:20 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:20 - INFO - __main__ -     runs in vtlm step and loss =24.000000 2.561702
+05/27/2022 03:27:21 - INFO - __main__ -     runs in vtlm step and loss =24.000000 2.595552
+05/27/2022 03:27:22 - INFO - __main__ -     runs in vtlm step and loss =24.000000 2.585178
+05/27/2022 03:27:22 - INFO - __main__ -     runs in vtlm step and loss =24.000000 2.513621
+05/27/2022 03:27:31 - INFO - __main__ -   The CPU usage is 0.900000: 
+05/27/2022 03:27:31 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:39 - INFO - __main__ -   The CPU usage is 1.400000: 
+05/27/2022 03:27:39 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:39 - INFO - __main__ -     runs in vtlm step and loss =32.000000 2.477364
+05/27/2022 03:27:40 - INFO - __main__ -     runs in vtlm step and loss =32.000000 2.582303
+05/27/2022 03:27:41 - INFO - __main__ -     runs in vtlm step and loss =32.000000 2.366928
+05/27/2022 03:27:41 - INFO - __main__ -     runs in vtlm step and loss =32.000000 2.531339
+05/27/2022 03:27:49 - INFO - __main__ -   The CPU usage is 1.600000: 
+05/27/2022 03:27:49 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:57 - INFO - __main__ -   The CPU usage is 1.200000: 
+05/27/2022 03:27:57 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:27:58 - INFO - __main__ -     runs in vtlm step and loss =40.000000 2.500633
+05/27/2022 03:27:59 - INFO - __main__ -     runs in vtlm step and loss =40.000000 2.643903
+05/27/2022 03:27:59 - INFO - __main__ -     runs in vtlm step and loss =40.000000 2.325918
+05/27/2022 03:28:00 - INFO - __main__ -     runs in vtlm step and loss =40.000000 2.404172
+05/27/2022 03:28:08 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:28:08 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:28:16 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:28:16 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:28:17 - INFO - __main__ -     runs in vtlm step and loss =48.000000 2.408194
+05/27/2022 03:28:18 - INFO - __main__ -     runs in vtlm step and loss =48.000000 2.607488
+05/27/2022 03:28:18 - INFO - __main__ -     runs in vtlm step and loss =48.000000 2.482253
+05/27/2022 03:28:19 - INFO - __main__ -     runs in vtlm step and loss =48.000000 2.456347
+05/27/2022 03:28:27 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:28:27 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:28:35 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:28:35 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:28:36 - INFO - __main__ -     runs in vtlm step and loss =56.000000 2.402743
+05/27/2022 03:28:37 - INFO - __main__ -     runs in vtlm step and loss =56.000000 2.333880
+05/27/2022 03:28:37 - INFO - __main__ -     runs in vtlm step and loss =56.000000 2.583730
+05/27/2022 03:28:38 - INFO - __main__ -     runs in vtlm step and loss =56.000000 2.455439
+05/27/2022 03:28:46 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:28:46 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:28:54 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:28:54 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:28:55 - INFO - __main__ -     runs in vtlm step and loss =64.000000 2.652385
+05/27/2022 03:28:56 - INFO - __main__ -     runs in vtlm step and loss =64.000000 2.380464
+05/27/2022 03:28:56 - INFO - __main__ -     runs in vtlm step and loss =64.000000 2.571339
+05/27/2022 03:28:57 - INFO - __main__ -     runs in vtlm step and loss =64.000000 2.522245
+05/27/2022 03:29:05 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:29:05 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:29:14 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:29:14 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:29:14 - INFO - __main__ -     runs in vtlm step and loss =72.000000 2.590849
+05/27/2022 03:29:15 - INFO - __main__ -     runs in vtlm step and loss =72.000000 2.638227
+05/27/2022 03:29:16 - INFO - __main__ -     runs in vtlm step and loss =72.000000 2.312940
+05/27/2022 03:29:16 - INFO - __main__ -     runs in vtlm step and loss =72.000000 2.702866
+05/27/2022 03:29:25 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:29:25 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:29:33 - INFO - __main__ -   The CPU usage is 0.000000: 
+05/27/2022 03:29:33 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:29:33 - INFO - __main__ -     runs in vtlm step and loss =80.000000 2.496592
+05/27/2022 03:29:34 - INFO - __main__ -     runs in vtlm step and loss =80.000000 2.435641
+05/27/2022 03:29:35 - INFO - __main__ -     runs in vtlm step and loss =80.000000 2.430968
+05/27/2022 03:29:35 - INFO - __main__ -     runs in vtlm step and loss =80.000000 2.466566
+05/27/2022 03:29:37 - INFO - volta.train_utils -   [Conceptual_Caption]: iter 80 Ep: 0.00 masked_t 2.890 masked_v 1.501 NSP 0.174 lr 4.83871e-08
+05/27/2022 03:29:44 - INFO - __main__ -   The CPU usage is 1.200000: 
+05/27/2022 03:29:44 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:29:52 - INFO - __main__ -   The CPU usage is 0.900000: 
+05/27/2022 03:29:52 - INFO - __main__ -   The RAM memory is 49.700000 used: 
+05/27/2022 03:29:52 - INFO - __main__ -     runs in vtlm step and loss =88.000000 2.491761
+05/27/2022 03:29:53 - INFO - __main__ -     runs in vtlm step and loss =88.000000 2.269180
+05/27/2022 03:29:54 - INFO - __main__ -     runs in vtlm step and loss =88.000000 2.555519
+05/27/2022 03:29:54 - INFO - __main__ -     runs in vtlm step and loss =88.000000 2.418427
+05/27/2022 03:30:03 - INFO - __main__ -   The CPU usage is 1.100000: 
+05/27/2022 03:30:03 - INFO - __main__ -   The RAM memory is 49.800000 used: 
+05/27/2022 03:30:11 - INFO - __main__ -   The CPU usage is 1.600000: 
+05/27/2022 03:30:11 - INFO - __main__ -   The RAM memory is 49.800000 used: 
+05/27/2022 03:30:12 - INFO - __main__ -     runs in vtlm step and loss =96.000000 2.429235
+05/27/2022 03:30:12 - INFO - __main__ -     runs in vtlm step and loss =96.000000 2.254373
+05/27/2022 03:30:13 - INFO - __main__ -     runs in vtlm step and loss =96.000000 2.313826
+slurmstepd: error: *** JOB 2141840 ON a00621 CANCELLED AT 2022-05-27T03:30:14 ***

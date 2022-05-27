@@ -21,11 +21,10 @@ from pytorch_transformers.optimization import AdamW, WarmupLinearSchedule
 
 from volta.config import BertConfig
 from volta.encoders import BertForVLPreTraining
-from volta.datasets import ConceptCapMultilingualLoaderTrain, ConceptCapMultilingualLoaderVal, ConceptCapVTLM_LoaderTrain
+from volta.datasets import ConceptCapMultilingualLoaderTrain, ConceptCapVTLM_LoaderTrain
 from volta.train_utils import freeze_layers, tbLogger, summary_parameters, save, resume
 
 from volta.datasets._captions_reader import MultilingualCaptionReader
-
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -36,10 +35,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 LANGS = "af am ar az be bg bn br bs ca cs cy da de el en es et fa fi fr fy ga gd gl gu ha he hi hr hu hy id is it ja jv ka kk km kn ko lo lt lv mg mk ml mn mr ms my ne nl no or pa pl ps pt ro ru sd si sk sl so sq sr su sv sw ta th tl tr uk ur uz vi xh yi zh"
 LANGS = LANGS.split()  # type: List[str]
-
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -320,7 +317,6 @@ def main():
                             vtlm_loss = vtlm_loss.mean()
                         vtlm_loss = vtlm_loss /args.grad_acc_steps
                         vtlm_loss.backward()
-                        logger.info("  runs in vtlm step and loss =%f %f",step, vtlm_loss)
 
                 if args.clip_grad_norm > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad_norm)
@@ -359,6 +355,7 @@ def main():
             if args.grad_acc_steps > 1:
                 loss = loss / args.grad_acc_steps
             loss.backward()
+
 
             if (step + 1) % args.grad_acc_steps == 0:
                 # Clip gradient

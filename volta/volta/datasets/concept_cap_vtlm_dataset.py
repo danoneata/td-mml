@@ -19,8 +19,7 @@ import torch.distributed as dist
 from volta.datasets.concept_cap_dataset import (
     ConceptCapLoaderTrain,
     ConceptCapLoaderVal,
-    BertPreprocessBatch,
-    InputFeatures
+    BertPreprocessBatch
 )
 from torch.utils.data import Dataset
 
@@ -329,7 +328,7 @@ class ConceptCapVTLM_LoaderVal(Dataset):
         # self.add_global_imgfeat = add_global_imgfeat
         # self.num_locs = num_locs
 
-class BertPreprocessBatch_vtlm(BertPreprocessBatch):
+class BertPreprocessBatch_vtlm():
     def __init__(
             self,
             caption_path,
@@ -373,9 +372,7 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
         image_feature_wp, image_cls_wp, obj_labels, obj_confs, attr_labels, attr_confs, attr_scores, \
         image_location_wp, num_boxes, image_h, image_w, image_id, caption = data
 
-        caption_en, caption_x, neg_lang = self.create_mlm_io(caption, image_id=image_id,
-                                                               neg_lang1=0.5, neg_lang2=0.5)
-
+        caption_x = self.create_mlm_io(image_id=image_id)
 
         image_feature = np.zeros((self.region_len, 2048), dtype=np.float32)
         image_cls = np.zeros((self.region_len, 1601), dtype=np.float32)
@@ -412,15 +409,12 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
             image_location[:, 4] = image_location[:, 2] - image_location[:, 0]
             image_location[:, 5] = image_location[:, 3] - image_location[:, 1]
 
-        tokens_caption_x = None
         if self.tokenizer_name == "bert-base-uncased":
-            tokens_caption_en = self.tokenizer.encode(caption_en)
-            if caption_x:
-                tokens_caption_x = self.tokenizer.encode(caption_x)
+            tokens_caption = self.tokenizer.encode(caption)
+            tokens_caption_x = self.tokenizer.encode(caption_x)
         else:
-            tokens_caption_en = self.tokenizer.encode(caption_en, add_special_tokens=False)
-            if caption_x:
-                tokens_caption_x = self.tokenizer.encode(caption_x, add_special_tokens=False)
+            tokens_caption = self.tokenizer.encode(caption, add_special_tokens=False)
+            tokens_caption_x = self.tokenizer.encode(caption_x, add_special_tokens=False)
 
         cur_example = InputExample(
             image_feat=image_feature,
@@ -430,9 +424,8 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
             attr_labels=attr_labels,
             attr_confs=attr_confs,
             image_attrs=image_attrs,
-            caption_en= tokens_caption_en,
+            caption= tokens_caption,
             caption_x = tokens_caption_x,
-            order = neg_lang,
             image_loc=image_location,
             num_boxes=num_boxes,
             overlaps=overlaps,
@@ -466,30 +459,28 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
         """
         """
         image_feat = example.image_feat
-        tokens_en = example.caption_en
+        tokens_en = example.caption
         image_loc = example.image_loc
         image_cls = example.image_cls
         num_boxes = int(example.num_boxes)
-        overlaps = example.overlaps
+        # overlaps = example.overlaps
 
-        sample_tokens = None
-        order = None
-        sample_label =None
         lm_label_ids =None
-
         tokens_en_label=None
         tokens_x_label =None
         tokens_x=None
 
-        if example.caption_x and example.order:
+        if example.caption_x:
             tokens_x = example.caption_x
-            order = example.order
 
             special_tokens_count = 4 if sep_token_extra else 3
             self._truncate_seq_pairs(tokens_en, tokens_x, max_seq_length - special_tokens_count)
 
-            tokens_en, tokens_en_label = self.random_word(tokens_en, tokenizer)
-            tokens_x, tokens_x_label = self.random_word(tokens_x, tokenizer)
+            tokens_, tokens_label = self.random_word(tokens_en+tokens_x, tokenizer)
+            tokens_en = tokens_[:len(tokens_en)]
+            tokens_x = tokens_[len(tokens_en):]
+            tokens_en_label = tokens_label[:len(tokens_en)]
+            tokens_x_label = tokens_label[len(tokens_en):]
 
         else:
             self._truncate_seq_pair(tokens_en, max_seq_length - 2)
@@ -502,36 +493,44 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
         image_label= [-1] * num_boxes
         masked_label = np.zeros((image_feat.shape[0]))
 
-        segment_ids = None
-        tokens=None
         # concatenate lm labels and account for CLS and SEP: [CLS] tokens [SEP]
         if self.tokenizer_name == "bert-base-uncased":
-            if example.caption_x and example.order:
-                if order=='first':
-                    tokens = tokenizer.add_special_tokens_single_sentence(tokens_en, tokens_x)
-                    lm_label_ids = [-1] + tokens_en_label + [-1] + tokens_x_label + [-1]
-                    segment_ids = [0] + [0] * len(tokens_en) + [1] + [1] * len(tokens_x) + [1]
-                elif order=='second':
-                    tokens = tokenizer.add_special_tokens_single_sentence(tokens_x, tokens_en)
-                    lm_label_ids = [-1] + tokens_x_label + [-1] + tokens_en_label + [-1]
-                    segment_ids = [0] + [0] * len(tokens_x) + [1] + [1] * len(tokens_en) + [1]
-                else:
-                    print('Error in convert_example_to_features bert-base-uncased tokenizer')
+            if example.caption_x:
+                tokens = tokenizer.add_special_tokens_single_sentence(tokens_en, tokens_x)
+                lm_label_ids = [-1]
+                lm_label_ids.extend(tokens_en_label)
+                lm_label_ids.extend([-1])
+                lm_label_ids.extend(tokens_x_label)
+                lm_label_ids.extend([-1])
+
+                segment_ids = [0]
+                segment_ids.extend([0] * len(tokens_en))
+                segment_ids.extend([1])
+                segment_ids.extend([1] * len(tokens_x))
+                segment_ids.extend([1])
+                # lm_label_ids = [-1] + tokens_en_label + [-1] + tokens_x_label + [-1]
+                # segment_ids = [0] + [0] * len(tokens_en) + [1] + [1] * len(tokens_x) + [1]
             else:
                 tokens = tokenizer.add_special_tokens_single_sentence(tokens_en)
                 segment_ids = [0] * len(tokens)
         else:
-            if example.caption_x and example.order:
-                if order=='first':
-                    tokens = tokenizer.build_inputs_with_special_tokens(tokens_en, tokens_x)
-                    lm_label_ids = [-1] + tokens_en_label + [-1] + [-1] + tokens_x_label + [-1]
-                    segment_ids = [0] + [0] * len(tokens_en) + [0] + [1] + [1] * len(tokens_x) + [1]
-                elif order=='second':
-                    tokens = tokenizer.build_inputs_with_special_tokens(tokens_x, tokens_en)
-                    lm_label_ids = [-1] + tokens_x_label + [-1] + [-1] + tokens_en_label + [-1]
-                    segment_ids = [0]+ [0] * len(tokens_x)+ [0] + [1]+ [1] * len(tokens_en) + [1]
-                else:
-                    print('Error in convert_example_to_features other tokenizer')
+            if example.caption_x:
+                tokens = tokenizer.build_inputs_with_special_tokens(tokens_en, tokens_x)
+                lm_label_ids = [-1]
+                lm_label_ids.extend(tokens_en_label)
+                lm_label_ids.extend([-1])
+                lm_label_ids.extend([-1])
+                lm_label_ids.extend(tokens_x_label)
+                lm_label_ids.extend([-1])
+
+                segment_ids = [0]
+                segment_ids.extend([0] * len(tokens_en))
+                segment_ids.extend([0])
+                segment_ids.extend([1])
+                segment_ids.extend([1] * len(tokens_x))
+                segment_ids.extend([1])
+                # lm_label_ids = [-1] + tokens_en_label + [-1] + [-1] + tokens_x_label + [-1]
+                # segment_ids = [0] + [0] * len(tokens_en) + [0] + [1] + [1] * len(tokens_x) + [1]
             else:
                 tokens = tokenizer.build_inputs_with_special_tokens(tokens_en)
                 segment_ids = [0] * len(tokens)
@@ -539,20 +538,6 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
         # segment_ids = [0] * len(tokens)
         input_ids = tokens
         position_ids = [0] * len(tokens)
-
-        #create position_ids, specific built for XLMR if we set position_ids instead of segment_ids
-        # if sequence_b_segment_id in segment_ids:
-        #     position_ids = [0] * len(tokens)
-        # else:
-        #     position_ids = []
-        #     position_id = 0
-        #     for id in range(len(tokens_en_label)+2):
-        #         position_id += 1
-        #         position_ids.append(position_id)
-        #     position_id = 0
-        #     for id in range(len(tokens_x_label)+2):
-        #         position_id += 1
-        #         position_ids.append(position_id)
 
         # The mask has 1 for real tokens and 0 for padding tokens. Only real tokens are attended to.
         input_mask = [1] * len(input_ids)
@@ -614,14 +599,10 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
                 return json.load(f)
         return {lang: load1(lang) for lang in langs}
 
-    def create_mlm_io(self, caption, image_id, neg_lang1=0.5, neg_lang2=0.5):
+    def create_mlm_io(self, image_id):
         lang = self.sample_language(image_id)
         sample_caption = self.captions[lang][image_id]
-        if random.random() > neg_lang1:
-            neg_lang = "first"
-        else:
-            neg_lang = "second"
-        return caption, sample_caption, neg_lang
+        return sample_caption
 
     def _truncate_seq_pairs(self, tokens_a, tokens_b, max_length):
         """Truncates a sequence pair in place to the maximum length."""
@@ -638,6 +619,46 @@ class BertPreprocessBatch_vtlm(BertPreprocessBatch):
                 tokens_a.pop()
             else:
                 tokens_b.pop()
+
+    def _truncate_seq_pair(self, tokens_b, max_length):
+        """Truncates a sequence pair in place to the maximum length."""
+
+        # This is a simple heuristic which will always truncate the longer sequence
+        # one token at a time. This makes more sense than truncating an equal percent
+        # of tokens from each, since if one sequence is very short then each token
+        # that's truncated likely contains more information than a longer sequence.
+        while True:
+            total_length = len(tokens_b)
+            if total_length <= max_length:
+                break
+            tokens_b.pop()
+
+    def random_word(self, tokens, tokenizer):
+        output_label = []
+
+        for i, token in enumerate(tokens):
+            prob = random.random()
+            # mask token with 15% probability
+
+            if prob < 0.15 and (not self.visualization):
+                prob /= 0.15
+
+                # 80% randomly change token to mask token
+                if prob < 0.8:
+                    tokens[i] = tokenizer.convert_tokens_to_ids(tokenizer.mask_token)
+
+                # 10% randomly change token to random token
+                elif prob < 0.9:
+                    tokens[i] = np.random.randint(len(tokenizer))
+
+                # -> rest 10% randomly keep current token
+                # append current token to output (we will predict these later)
+                output_label.append(token)
+            else:
+                # no masking token (will be ignored by loss function later)
+                output_label.append(-1)
+
+        return tokens, output_label
 
 # Functions used for language sampling
 
@@ -693,8 +714,7 @@ class InputExample(object):
             attr_labels=None,
             attr_confs=None,
             image_attrs=None,
-            caption_en=None,
-            order= None,
+            caption=None,
             lm_labels=None,
             image_loc=None,
             num_boxes=None,
@@ -723,5 +743,4 @@ class InputExample(object):
         self.image_attrs = image_attrs
         self.num_boxes = num_boxes
         self.overlaps = overlaps
-        self.caption_en = caption_en
-        self.order = order
+        self.caption = caption

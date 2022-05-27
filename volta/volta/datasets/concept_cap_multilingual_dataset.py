@@ -231,7 +231,7 @@ class BertPreprocessMultilingualBatch(BertPreprocessBatch):
             return LanguageSamplingDefault(self.captions)
 
         elif os.path.exists(path):
-            return LanguageSamplingGiven(path, self.langs)
+            return LanguageSamplingGiven(path, self.langs,self.captions)
         else:
             assert False, "path should be `None` or exist:\n{}".format(path)
 
@@ -282,7 +282,7 @@ class LanguageSamplingGiven:
     https://colab.research.google.com/drive/1bH3vyF6YhniM7XVXyIHoiDpHN57Kth1O
 
     """
-    def __init__(self, path, langs_=None):
+    def __init__(self, path, langs_=None, captions =None):
         data = np.load(path)
         p_lang_and_sent = data["p_lang_and_sent"]
         langs = data["langs"]
@@ -298,13 +298,21 @@ class LanguageSamplingGiven:
             for i, sent in enumerate(sents)
         }
         self.langs_ = langs_
+        self.captions = captions
 
     def __call__(self, image_id):
         p = self.p_lang_given_sent[image_id]
-        if self.langs_ is None:
-            return random.choices(self.langs, weights=p)[0]
+
+        langs_translated = [
+            lang
+            for lang, captions_lang in self.captions.items()
+            if image_id in captions_lang and lang in self.langs_
+        ]
+        if self.langs_ is not None:
+            langs_translated_p = random.choices(self.langs, weights=p)
+            langs_translated_out = list(set(langs_translated) & set(langs_translated_p))
+            return langs_translated_out[0] if len(langs_translated_out)>0 else 'en'
+
         else:
-            out_langs = None
-            while out_langs not in self.langs_:
-                out_langs = random.choices(self.langs, weights=p)[0]
-            return out_langs
+            return random.choices(self.langs, weights=p)[0]
+
