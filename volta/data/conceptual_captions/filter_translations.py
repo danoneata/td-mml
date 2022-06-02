@@ -46,7 +46,7 @@ threshs = {
         "uniformity": u,
     },
     "et": {
-        "sim-tgt-src-bleu": s_indo,
+        "sim-tgt-src-bleu": s_non_indo,
         "uniformity": u,
     },
     "fr": {
