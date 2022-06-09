@@ -11,6 +11,7 @@ from .concept_cap_vtlm_dataset import ConceptCapVTLM_LoaderTrain
 
 # from .vqa_dataset import VQAClassificationDataset
 from .nlvr2_dataset import NLVR2Dataset, NLVR2Loader
+from .nlvr2_multilingual_dataset import NLVR2MultilingualLoader
 # from .refer_expression_dataset import ReferExpressionDataset
 from .retrieval_dataset import RetrievalDataset, RetrievalDatasetVal, RetrievalLoader
 # from .vcr_dataset import VCRDataset
@@ -18,6 +19,7 @@ from .visual_entailment_dataset import VisualEntailmentDataset
 # from .refer_dense_caption import ReferDenseCpationDataset
 # from .visual_genome_dataset import GenomeQAClassificationDataset
 from .gqa_dataset import GQAClassificationDataset, GQAClassificationLoader
+from .gqa_multilingual_dataset import GQAMultilingualClassificationLoader
 # from .guesswhat_dataset import GuessWhatDataset
 # from .visual7w_pointing_dataset import Visual7wPointingDataset
 # from .guesswhat_pointing_dataset import GuessWhatPointingDataset
@@ -98,3 +100,15 @@ DatasetMapEval = {
     "RetrievalConcap": RetrievalDatasetVal,
 }
 
+
+DatasetMultilingualMapTrain = {
+    "RetrievalCOCO": RetrievalDataset,
+    "RetrievalFlickr30k": RetrievalDataset,
+    "NLVR2": NLVR2Dataset,
+    "NLVR2MultilingualLoader": NLVR2MultilingualLoader,
+    "VisualEntailment": VisualEntailmentDataset,
+    "GQA": GQAClassificationDataset,
+    "GQALoader": GQAMultilingualClassificationLoader,
+    "XVNLI": VisualEntailmentDataset,
+    "RetrievalWITLoader": RetrievalLoader,
+}
