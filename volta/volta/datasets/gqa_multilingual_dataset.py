@@ -10,6 +10,7 @@ import logging
 import _pickle as cPickle
 import json
 import jsonlines
+import random
 
 import base64
 import numpy as np
@@ -303,11 +304,7 @@ class GQAMultilingualClassificationLoader(object):
                 split='train'
             )
             ds = td.PrefetchData(ds, cache, 1)
-            dss = [
-                td.MapData(ds, lambda item: preprocess_function(item, lang))
-                for lang in self.langs
-            ]
-            ds = td.ConcatData(dss)
+            ds = td.MapData(ds, preprocess_function)
         else:
             ds = td.LocallyShuffleData(ds, cache)
             preprocess_function = BertPreprocessMultilingualBatch(
@@ -336,70 +333,133 @@ class GQAMultilingualClassificationLoader(object):
         self.num_locs = num_locs
 
     def __iter__(self):
+        if self.split == 'train':
+            for ix, batch in enumerate(self.ds.get_data()):
+                for idx in range(len(self.langs)):
+                    image_feats, image_locs, image_masks, \
+                        input_ids, input_mask, segment_ids, \
+                        labels, scores, \
+                        image_ids, question_ids = batch[idx*10:(idx+1)*10]
 
-        for ix, batch in enumerate(self.ds.get_data()):
+                    batch_size = input_ids.shape[0]
 
-            image_feats, image_locs, image_masks, \
+                    if self.add_global_imgfeat == "first":
+                        sum_count = np.sum(image_masks == 1, axis=1, keepdims=True)
+                        # sum_count[sum_count == 0] = 1
+                        g_image_feats = np.sum(image_feats, axis=1) / sum_count
+                        image_feats = np.concatenate([np.expand_dims(g_image_feats, axis=1), image_feats], axis=1)
+                        image_feats = np.array(image_feats, dtype=np.float32)
+
+                        g_loc = [0, 0, 1, 1] + [1]*(self.num_locs - 4)
+                        g_image_locs = np.repeat(np.array([g_loc], dtype=np.float32), batch_size, axis=0)
+                        image_locs = np.concatenate([np.expand_dims(g_image_locs, axis=1), image_locs], axis=1)
+
+                        image_locs = np.array(image_locs, dtype=np.float32)
+                        g_image_masks = np.repeat(np.array([[1]]), batch_size, axis=0)
+                        image_masks = np.concatenate([g_image_masks, image_masks], axis=1)
+
+                    elif self.add_global_imgfeat == "last":
+                        sum_count = np.sum(image_masks == 1, axis=1, keepdims=True)
+                        # sum_count[sum_count == 0] = 1
+                        g_image_feats = np.sum(image_feats, axis=1) / sum_count
+                        image_feats = np.concatenate([image_feats, np.expand_dims(g_image_feats, axis=1)], axis=1)
+                        image_feats = np.array(image_feats, dtype=np.float32)
+
+                        g_loc = [0, 0, 1, 1] + [1]*(self.num_locs - 4)
+                        g_image_locs = np.repeat(np.array([g_loc], dtype=np.float32), batch_size, axis=0)
+                        image_locs = np.concatenate([image_locs, np.expand_dims(g_image_locs, axis=1)], axis=1)
+
+                        image_locs = np.array(image_locs, dtype=np.float32)
+                        g_image_masks = np.repeat(np.array([[1]]), batch_size, axis=0)
+                        image_masks = np.concatenate([image_masks, g_image_masks], axis=1)
+
+                    image_feats = torch.tensor(image_feats, dtype=torch.float)
+                    image_locs = torch.tensor(image_locs, dtype=torch.float)
+                    image_masks = torch.tensor(image_masks, dtype=torch.long)
+                    input_ids = torch.tensor(input_ids, dtype=torch.long)
+                    input_mask = torch.tensor(input_mask, dtype=torch.long)
+                    segment_ids = torch.tensor(segment_ids, dtype=torch.long)
+                    labels = torch.tensor(labels, dtype=torch.long)
+                    scores = torch.tensor(scores, dtype=torch.float)
+                    target = torch.zeros((batch_size, self.num_labels), dtype=torch.float)
+                    if labels is not None:
+                        target.scatter_(1, labels, scores)
+
+                    data = (
+                        image_feats,
+                        image_locs,
+                        image_masks,
+                        input_ids,
+                        target,
+                        input_mask,
+                        segment_ids,
+                        torch.tensor(question_ids),
+                        torch.tensor(ix)
+                    )
+                    yield data
+        else:
+            for ix, batch in enumerate(self.ds.get_data()):
+                image_feats, image_locs, image_masks, \
                 input_ids, input_mask, segment_ids, \
                 labels, scores, \
                 image_ids, question_ids = batch
 
-            batch_size = input_ids.shape[0]
+                batch_size = input_ids.shape[0]
 
-            if self.add_global_imgfeat == "first":
-                sum_count = np.sum(image_masks == 1, axis=1, keepdims=True)
-                # sum_count[sum_count == 0] = 1
-                g_image_feats = np.sum(image_feats, axis=1) / sum_count
-                image_feats = np.concatenate([np.expand_dims(g_image_feats, axis=1), image_feats], axis=1)
-                image_feats = np.array(image_feats, dtype=np.float32)
+                if self.add_global_imgfeat == "first":
+                    sum_count = np.sum(image_masks == 1, axis=1, keepdims=True)
+                    # sum_count[sum_count == 0] = 1
+                    g_image_feats = np.sum(image_feats, axis=1) / sum_count
+                    image_feats = np.concatenate([np.expand_dims(g_image_feats, axis=1), image_feats], axis=1)
+                    image_feats = np.array(image_feats, dtype=np.float32)
 
-                g_loc = [0, 0, 1, 1] + [1]*(self.num_locs - 4)
-                g_image_locs = np.repeat(np.array([g_loc], dtype=np.float32), batch_size, axis=0)
-                image_locs = np.concatenate([np.expand_dims(g_image_locs, axis=1), image_locs], axis=1)
+                    g_loc = [0, 0, 1, 1] + [1] * (self.num_locs - 4)
+                    g_image_locs = np.repeat(np.array([g_loc], dtype=np.float32), batch_size, axis=0)
+                    image_locs = np.concatenate([np.expand_dims(g_image_locs, axis=1), image_locs], axis=1)
 
-                image_locs = np.array(image_locs, dtype=np.float32)
-                g_image_masks = np.repeat(np.array([[1]]), batch_size, axis=0)
-                image_masks = np.concatenate([g_image_masks, image_masks], axis=1)
+                    image_locs = np.array(image_locs, dtype=np.float32)
+                    g_image_masks = np.repeat(np.array([[1]]), batch_size, axis=0)
+                    image_masks = np.concatenate([g_image_masks, image_masks], axis=1)
 
-            elif self.add_global_imgfeat == "last":
-                sum_count = np.sum(image_masks == 1, axis=1, keepdims=True)
-                # sum_count[sum_count == 0] = 1
-                g_image_feats = np.sum(image_feats, axis=1) / sum_count
-                image_feats = np.concatenate([image_feats, np.expand_dims(g_image_feats, axis=1)], axis=1)
-                image_feats = np.array(image_feats, dtype=np.float32)
+                elif self.add_global_imgfeat == "last":
+                    sum_count = np.sum(image_masks == 1, axis=1, keepdims=True)
+                    # sum_count[sum_count == 0] = 1
+                    g_image_feats = np.sum(image_feats, axis=1) / sum_count
+                    image_feats = np.concatenate([image_feats, np.expand_dims(g_image_feats, axis=1)], axis=1)
+                    image_feats = np.array(image_feats, dtype=np.float32)
 
-                g_loc = [0, 0, 1, 1] + [1]*(self.num_locs - 4)
-                g_image_locs = np.repeat(np.array([g_loc], dtype=np.float32), batch_size, axis=0)
-                image_locs = np.concatenate([image_locs, np.expand_dims(g_image_locs, axis=1)], axis=1)
+                    g_loc = [0, 0, 1, 1] + [1] * (self.num_locs - 4)
+                    g_image_locs = np.repeat(np.array([g_loc], dtype=np.float32), batch_size, axis=0)
+                    image_locs = np.concatenate([image_locs, np.expand_dims(g_image_locs, axis=1)], axis=1)
 
-                image_locs = np.array(image_locs, dtype=np.float32)
-                g_image_masks = np.repeat(np.array([[1]]), batch_size, axis=0)
-                image_masks = np.concatenate([image_masks, g_image_masks], axis=1)
+                    image_locs = np.array(image_locs, dtype=np.float32)
+                    g_image_masks = np.repeat(np.array([[1]]), batch_size, axis=0)
+                    image_masks = np.concatenate([image_masks, g_image_masks], axis=1)
 
-            image_feats = torch.tensor(image_feats, dtype=torch.float)
-            image_locs = torch.tensor(image_locs, dtype=torch.float)
-            image_masks = torch.tensor(image_masks, dtype=torch.long)
-            input_ids = torch.tensor(input_ids, dtype=torch.long)
-            input_mask = torch.tensor(input_mask, dtype=torch.long)
-            segment_ids = torch.tensor(segment_ids, dtype=torch.long)
-            labels = torch.tensor(labels, dtype=torch.long)
-            scores = torch.tensor(scores, dtype=torch.float)
-            target = torch.zeros((batch_size, self.num_labels), dtype=torch.float)
-            if labels is not None:
-                target.scatter_(1, labels, scores)
+                image_feats = torch.tensor(image_feats, dtype=torch.float)
+                image_locs = torch.tensor(image_locs, dtype=torch.float)
+                image_masks = torch.tensor(image_masks, dtype=torch.long)
+                input_ids = torch.tensor(input_ids, dtype=torch.long)
+                input_mask = torch.tensor(input_mask, dtype=torch.long)
+                segment_ids = torch.tensor(segment_ids, dtype=torch.long)
+                labels = torch.tensor(labels, dtype=torch.long)
+                scores = torch.tensor(scores, dtype=torch.float)
+                target = torch.zeros((batch_size, self.num_labels), dtype=torch.float)
+                if labels is not None:
+                    target.scatter_(1, labels, scores)
 
-            data = (
-                image_feats,
-                image_locs,
-                image_masks,
-                input_ids,
-                target,
-                input_mask, 
-                segment_ids, 
-                torch.tensor(question_ids),
-                torch.tensor(ix)
-            )
-            yield data
+                data = (
+                    image_feats,
+                    image_locs,
+                    image_masks,
+                    input_ids,
+                    target,
+                    input_mask,
+                    segment_ids,
+                    torch.tensor(question_ids),
+                    torch.tensor(ix)
+                )
+                yield data
 
     def __len__(self):
         return self.ds.size()
@@ -472,13 +532,14 @@ class BertPreprocessMultilingualBatch(object):
         self._padding_index = padding_index
         self.norm_embeddings = norm_embeddings
         self.langs = langs
+        self.split = split
         self.translation_path=translation_path
         if (self.translation_path is not None) and (self.langs is not None):
             logger.info("Loading nvlr2 annotations_jsonpath from %s" % self.translation_path)
             self.translations = self.load_translations(self.translation_path, split, self.langs)
+            self.sample_language = self.prepare_langauge_sampler()
 
-
-    def __call__(self, item, lang='en'):
+    def __call__(self, item):
         image_feature = np.zeros((self.region_len, 2048), dtype=np.float32)
         image_location = np.zeros((self.region_len, self.num_locs), dtype=np.float32)
 
@@ -516,42 +577,82 @@ class BertPreprocessMultilingualBatch(object):
             image_location = image_location / np.linalg.norm(image_location, 2, 1, keepdims=True)
 
         image_feature[:num_boxes] = features
+        if self.split == 'train':
+            cur_tensors_langs_ = ()
+            for lang_ in self.langs:
+                image_id = item['img_id']
+                entry = _create_entry(item["entry"])
+                question_id = entry["question_id"]
+                if (self.translation_path is not None) and (self.langs is not None):
+                    if item['question_id'] in self.translations[lang_]:
+                        tokens = self.tokenizer.encode(self.translations[lang_][item['question_id']])
+                    else:
+                        sample_lang = self.sample_language(item['id'])
+                        tokens = self.tokenizer.encode(self.translations[sample_lang][item['question_id']])
+                else:
+                    tokens = self.tokenizer.encode(item["sentence"])
+                tokens = [tokens[0]] + tokens[1:-1][: self.seq_len - 2] + [tokens[-1]]
+                answer = entry["answer"]
 
-        image_id = item['img_id']
-        entry = _create_entry(item["entry"])
-        question_id = entry["question_id"]
-        if (self.translation_path is not None) and (self.langs is not None):
-            tokens = self.tokenizer.encode(self.translations[lang][item['question_id']])
+                cur_example = InputExample(
+                    image_feat=image_feature,
+                    image_loc=image_location,
+                    num_boxes=num_boxes,
+                    tokens=tokens,
+                    labels=answer["labels"],
+                    scores=answer["scores"],
+                )
+
+                # transform sample to features
+                cur_features = self.convert_example_to_features(cur_example, self.seq_len, self.tokenizer, self.region_len)
+
+                cur_tensors = (
+                    cur_features.image_feat,
+                    cur_features.image_loc,
+                    cur_features.image_mask,
+                    cur_features.input_ids,
+                    cur_features.input_mask,
+                    cur_features.segment_ids,
+                    cur_features.labels,
+                    cur_features.scores,
+                    image_id,
+                    question_id,
+                )
+                cur_tensors_langs_ = cur_tensors_langs_ + cur_tensors
+            return cur_tensors_langs_
         else:
+            image_id = item['img_id']
+            entry = _create_entry(item["entry"])
+            question_id = entry["question_id"]
             tokens = self.tokenizer.encode(item["sentence"])
-        tokens = [tokens[0]] + tokens[1:-1][: self.seq_len - 2] + [tokens[-1]]
-        answer = entry["answer"]
+            tokens = [tokens[0]] + tokens[1:-1][: self.seq_len - 2] + [tokens[-1]]
+            answer = entry["answer"]
 
-        cur_example = InputExample(
-            image_feat=image_feature,
-            image_loc=image_location,
-            num_boxes=num_boxes,
-            tokens=tokens,
-            labels=answer["labels"],
-            scores=answer["scores"],
-        )
+            cur_example = InputExample(
+                image_feat=image_feature,
+                image_loc=image_location,
+                num_boxes=num_boxes,
+                tokens=tokens,
+                labels=answer["labels"],
+                scores=answer["scores"],
+            )
 
-        # transform sample to features
-        cur_features = self.convert_example_to_features(cur_example, self.seq_len, self.tokenizer, self.region_len)
+            # transform sample to features
+            cur_features = self.convert_example_to_features(cur_example, self.seq_len, self.tokenizer, self.region_len)
 
-        cur_tensors = (
-            cur_features.image_feat,
-            cur_features.image_loc,
-            cur_features.image_mask,
-            cur_features.input_ids,
-            cur_features.input_mask,
-            cur_features.segment_ids,
-            cur_features.labels,
-            cur_features.scores,
-            image_id,
-            question_id,
-        )
-        return cur_tensors
+            cur_tensors = (
+                cur_features.image_feat,
+                cur_features.image_loc,
+                cur_features.image_mask,
+                cur_features.input_ids,
+                cur_features.input_mask,
+                cur_features.segment_ids,
+                cur_features.labels,
+                cur_features.scores,
+                image_id,
+                question_id,
+            )
+            return cur_tensors
 
     def convert_example_to_features(self, example, max_seq_length, tokenizer, max_region_length):
 
@@ -604,3 +705,19 @@ class BertPreprocessMultilingualBatch(object):
                     trans_dict[item['question_id']] = item['sentence']
             return trans_dict
         return {lang: load1(lang) for lang in langs}
+
+    def prepare_langauge_sampler(self):
+        return LanguageSamplingDefault(self.translations)
+
+class LanguageSamplingDefault:
+    """Uniformly picks one of the languages for which we have a translation."""
+    def __init__(self, captions):
+        self.captions = captions
+
+    def __call__(self, image_id):
+        langs_translated = [
+            lang
+            for lang, captions_lang in self.captions.items()
+            if image_id in captions_lang
+        ]
+        return random.choice(langs_translated)

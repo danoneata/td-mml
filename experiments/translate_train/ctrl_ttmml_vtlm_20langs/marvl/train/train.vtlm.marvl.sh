@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=fi_random_mar
+#SBATCH --job-name=mar_vtlm
 #SBATCH --ntasks=1 --cpus-per-task=40
-#SBATCH -p gpu --gres=gpu:titanrtx:2 
-#SBATCH --time=3-00:00:00
-#SBATCH --output="logs/train.filter-multilingual.marvl.random_lg.step_100000.batch_size_256.langs_20.log"
+#SBATCH -p gpu --gres=gpu:titanrtx:1 --mem=5GB
+#SBATCH --time=3-16:00:00
+#SBATCH --output="logs/train.multilingual.marvl.vtlm.step_100000.batch_size_256.langs_20.full.log"
 
 TASK=12
 TASK_NAME=marvl
@@ -13,18 +13,18 @@ MODEL_CONFIG=ctrl_xuniter_base
 TASKS_CONFIG=iglue_trainval_tasks_boxes36.dtu
 DIR=/science/image/nlp-datasets/tt-mml
 
-STRATEGY=random_lg
+STRATEGY=vtlm
 STEP=100000
 LANGS=20
 TRAIN_BATCH_SIZE=256
 PRETRAIN_FILE=pytorch_model_epoch_9_step_100000.bin
-TETASK=${TASK_NAME}-${STRATEGY}-batch_size_${TRAIN_BATCH_SIZE}-step_${STEP}-langs_${LANGS}-filter
+TETASK=${TASK_NAME}-${STRATEGY}-batch_size_${TRAIN_BATCH_SIZE}-step_${STEP}-langs_${LANGS}-full
 
 PRETRAINED=$DIR/checkpoints/iglue/pretrain/ctrl_ttmml_${STRATEGY}_${LANGS}langs/${MODEL_CONFIG}/train_batch_size_${TRAIN_BATCH_SIZE}/conceptual_captions-${STRATEGY}/${MODEL_CONFIG}/${PRETRAIN_FILE}
 OUTPUT_DIR=$DIR/tt-mml-iglue/experiments/translate_train/ctrl_ttmml_${STRATEGY}_${LANGS}langs/${TASK_NAME}/train/${TETASK}
 LOGGING_DIR=$DIR/logs/multilingual_marvl/ctrl_ttmml_${STRATEGY}_${LANGS}langs/${MODEL_CONFIG}/train_batch_size_${TRAIN_BATCH_SIZE}/${TETASK}
 
-TRANS_PATH=$DIR/data/translate_train/nlvr2/filter
+TRANS_PATH=$DIR/data/translate_train/nlvr2/full
 
 source /science/image/nlp-datasets/tt-mml/envs/tt-mml/bin/activate
 

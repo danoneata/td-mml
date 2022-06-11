@@ -322,6 +322,8 @@ def main():
             iter_id = start_iter_id + step // args.grad_acc_steps + (epoch_id * len(dl_train))
 
             loss, score = ForwardModelsTrain(config, task_cfg, device, task, batch, model, criterion)
+            if n_gpu > 1:
+                loss = loss.mean()
             scores += score
 
             if args.grad_acc_steps > 1:
