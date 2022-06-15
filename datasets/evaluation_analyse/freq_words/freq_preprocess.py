@@ -102,17 +102,16 @@ class PreprocessMultilingualBatch(object):
         freq_ = dict()
 
         for lang_ in self.langs:
-
             translated_sents = [
-                remove_punctuation(sentence)
-                for lang, captions_lang in self.captions.items()
-                for id, sentence in captions_lang.items()
-                if lang in lang_
+                remove_punctuation(sentence.lower())
+                for id, sentence in self.captions[lang_].items()
             ]
             if lang_ in ['zh']:
                 translated_sents = [' '.join(list(jieba.cut(m))) for m in translated_sents]
-            print("translated_sents demo: ",translated_sents[:10])
+
+            print("translated_sents demo: ",translated_sents[:3])
             filter_translated_sents = [self.del_stopwords(m.split(), lang_) for m in translated_sents]
+            print("filter_translated_sents demo: ", filter_translated_sents[:3])
             flatten_sents = [i for item in filter_translated_sents for i in item]
             counter_sents = Counter(flatten_sents)
             freq_[lang_] = counter_sents
@@ -132,46 +131,39 @@ class PreprocessMultilingualBatch(object):
 
         scores_all = dict()
         for lang_ in self.langs:
-            print(list(self.freqs_[lang_].items())[:30])
-            id2sents_per_lang = dict()
-            sents2id_per_lang = dict()
-            score_per_lang = dict()
-
             if lang_ not in ['en']:
                 id_sentences_pairs = [
                     [multiple_elements['id'], multiple_elements['caption']]
-                    for lang, captions_lang in self.eval_captions.items()
-                    for item, multiple_elements in captions_lang.items()
-                    if lang in lang_
+                    for item, multiple_elements in self.eval_captions[lang_].items()
                 ]
             else:
                 id_sentences_pairs = [
                     [multiple_elements['identifier'], multiple_elements['sentence']]
-                    for lang, captions_lang in self.eval_captions.items()
-                    for item, multiple_elements in captions_lang.items()
-                    if lang in lang_
+                    for item, multiple_elements in self.eval_captions[lang_].items()
                 ]
-            print(id_sentences_pairs[:10])
-            for item in id_sentences_pairs:
-                id2sents_per_lang[item[0]] = item[1]
-                sents2id_per_lang[item[1]] = item[0]
+            print(id_sentences_pairs[:5])
 
-            for idx, item in enumerate(self.eval_results[lang_]):
+            print("eval_results test examples:{} in language {}".format(len(self.eval_results[lang_]),lang_))
+            score_per_lang = []
+            for id, item in enumerate(self.eval_results[lang_]):
+
                 result = 0 if item['label'] == item['prediction'] else 1
-                captions = remove_punctuation(item['sentence'])
+                captions = remove_punctuation(item['sentence'].lower())
                 if lang_ in ['zh']:
                     captions = ' '.join(list(jieba.cut(captions)))
-                captions_filter = self.del_stopwords([m for m in captions.split()], lang_)
-                example_id = sents2id_per_lang[item['sentence']]
+                captions_filter = self.del_stopwords(captions.split(), lang_)
+
                 avg_ = [self.freqs_[lang_][m] if m in self.freqs_[lang_].keys() else 0 for m in captions_filter]
                 avg_mins_ = copy(avg_)
                 avg_mins_.sort()
                 avg_min_l = avg_mins_[:2] if len(avg_mins_) >= 2 else [0, 0]
-                score_per_lang[example_id] = [{'label': item['label'], 'prediction': item['prediction'],
+                score_per_lang.append({'label': item['label'], 'prediction': item['prediction'],
                                                'result': result, 'score_avg': str(sum(avg_) / len(avg_)),
                                                'score_avg_mins': str(sum(avg_min_l) / 2),
                                                'frequence': ' '.join([str(m) for m in avg_]),
-                                               'caption': ' '.join(captions_filter), 'sentences': item['sentence']}]
+                                               'caption': ' '.join(captions_filter), 'sentences': item['sentence']})
+
+            print("score_per_lang keys lens {} for language {}".format(len(score_per_lang),lang_))
             scores_all[lang_] = score_per_lang
         if self.eval_mode == 'translate_train':
             with open(os.path.join(self.score_output_path,

@@ -6,7 +6,7 @@
 #SBATCH --output="logs/zero_shot.vtlm.tt-mml.freq_analysis"
 
 LANGS=6
-LANGS_SET=id-sw-ta-tr-en-zh
+LANGS_SET=en-id-sw-ta-tr-zh
 TASK=marvl
 MODE=vtlm
 EVAL_MODE=zero_shot

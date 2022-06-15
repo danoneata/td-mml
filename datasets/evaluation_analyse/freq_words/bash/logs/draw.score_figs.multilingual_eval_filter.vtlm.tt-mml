@@ -1,0 +1,12 @@
+strategy: vtlm
+step: 100000
+train_batch_size (pretrain-cc): 256
+pretrain langs:6
+draw.py:74: RuntimeWarning: invalid value encountered in long_scalars
+  return 100 * r.sum() / len(r)
+2022-06-15 16:36:08.424 
+  [33m[1mWarning:[0m to view this Streamlit app on a browser, run it with the following
+  command:
+
+    streamlit run draw.py [ARGUMENTS]
+pretrain langs
