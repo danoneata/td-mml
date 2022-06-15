@@ -576,21 +576,37 @@ class BertPreprocessMultilingualBatch(object):
             features = F.normalize(features, dim=-1).numpy()
             image_location = image_location / np.linalg.norm(image_location, 2, 1, keepdims=True)
 
+        # image-text lmdb file keys : dict_keys(['attr_conf', 'attr_id', 'boxes', 'features', 'img_h', 'img_w', 'obj_conf', 'obj_id', 'img_id', 'entry'])
+        #  ['entry']['question_id','question','image_id']
         image_feature[:num_boxes] = features
         if self.split == 'train':
             cur_tensors_langs_ = ()
             for lang_ in self.langs:
                 image_id = item['img_id']
+
                 entry = _create_entry(item["entry"])
                 question_id = entry["question_id"]
+
                 if (self.translation_path is not None) and (self.langs is not None):
-                    if item['question_id'] in self.translations[lang_]:
-                        tokens = self.tokenizer.encode(self.translations[lang_][item['question_id']])
+                    if str(question_id) in self.translations[lang_]:
+                        tokens = self.tokenizer.encode(self.translations[lang_][str(question_id)])
+                    elif '0'+str(question_id) in self.translations[lang_]:
+                        tokens = self.tokenizer.encode(self.translations[lang_][str('0'+str(question_id))])
+                    elif '00'+ str(question_id) in self.translations[lang_]:
+                        tokens = self.tokenizer.encode(self.translations[lang_][str('00' + str(question_id))])
                     else:
-                        sample_lang = self.sample_language(item['id'])
-                        tokens = self.tokenizer.encode(self.translations[sample_lang][item['question_id']])
+                        # logger.info("qustion id {} not in translations {}".format(str(question_id), lang_))
+                        sample_lang, update_Qid = self.sample_language(str(question_id))
+                        if update_Qid is not None:
+                            if update_Qid in self.translations[sample_lang]:
+                                tokens = self.tokenizer.encode(self.translations[sample_lang][update_Qid])
+                            else:
+                                tokens = self.tokenizer.encode(self.translations[sample_lang][str('00'+update_Qid)])
+                        else:
+                            tokens = self.tokenizer.encode(self.translations[sample_lang][str(question_id)])
                 else:
-                    tokens = self.tokenizer.encode(item["sentence"])
+                    tokens = self.tokenizer.encode(entry["question"])
+
                 tokens = [tokens[0]] + tokens[1:-1][: self.seq_len - 2] + [tokens[-1]]
                 answer = entry["answer"]
 
@@ -624,7 +640,7 @@ class BertPreprocessMultilingualBatch(object):
             image_id = item['img_id']
             entry = _create_entry(item["entry"])
             question_id = entry["question_id"]
-            tokens = self.tokenizer.encode(item["sentence"])
+            tokens = self.tokenizer.encode(entry["question"])
             tokens = [tokens[0]] + tokens[1:-1][: self.seq_len - 2] + [tokens[-1]]
             answer = entry["answer"]
 
@@ -700,9 +716,11 @@ class BertPreprocessMultilingualBatch(object):
     def load_translations(path, split, langs):
         def load1(lang):
             trans_dict={}
-            with open(os.path.join(path, f"{split}-{lang}.jsonl")) as f:
-                for item in jsonlines.Reader(f):
-                    trans_dict[item['question_id']] = item['sentence']
+            with open(os.path.join(path, f"{split}-{lang}.json"), 'r', encoding='utf-8') as f:
+                data = json.loads(f.read())
+            for ln in data:
+                trans_dict[str(ln['question_id'])] = ln['sent']
+            print((list(trans_dict.items())[:2]))
             return trans_dict
         return {lang: load1(lang) for lang in langs}
 
@@ -720,4 +738,14 @@ class LanguageSamplingDefault:
             for lang, captions_lang in self.captions.items()
             if image_id in captions_lang
         ]
-        return random.choice(langs_translated)
+        if len(langs_translated)>0:
+            return random.choice(langs_translated), None
+        else:
+            langs_translated = [
+                lang
+                for lang, captions_lang in self.captions.items()
+                if '0'+str(image_id) in captions_lang or '00'+str(image_id) in captions_lang
+            ]
+            return random.choice(langs_translated) if len(langs_translated) > 0 else 'en', '0'+str(image_id)
+
+

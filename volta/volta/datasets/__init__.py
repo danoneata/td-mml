@@ -14,6 +14,7 @@ from .nlvr2_dataset import NLVR2Dataset, NLVR2Loader
 from .nlvr2_multilingual_dataset import NLVR2MultilingualLoader
 # from .refer_expression_dataset import ReferExpressionDataset
 from .retrieval_dataset import RetrievalDataset, RetrievalDatasetVal, RetrievalLoader
+
 # from .vcr_dataset import VCRDataset
 from .visual_entailment_dataset import VisualEntailmentDataset
 # from .refer_dense_caption import ReferDenseCpationDataset
@@ -104,11 +105,9 @@ DatasetMapEval = {
 DatasetMultilingualMapTrain = {
     "RetrievalCOCO": RetrievalDataset,
     "RetrievalFlickr30k": RetrievalDataset,
-    "NLVR2": NLVR2Dataset,
     "NLVR2MultilingualLoader": NLVR2MultilingualLoader,
     "VisualEntailment": VisualEntailmentDataset,
     "GQA": GQAClassificationDataset,
-    "GQALoader": GQAMultilingualClassificationLoader,
-    "XVNLI": VisualEntailmentDataset,
-    "RetrievalWITLoader": RetrievalLoader,
+    "GQAMultilingualLoader": GQAMultilingualClassificationLoader,
+    "XVNLI": VisualEntailmentDataset
 }
