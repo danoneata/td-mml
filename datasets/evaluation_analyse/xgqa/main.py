@@ -357,13 +357,22 @@ def show_qualitative_agreement_increase():
     data2 = load_data_("tt-mml-pretrain-finetune")
 
     data = [(data1[k], data2[k]) for k in data1.keys()]
-    data = sorted(data, key=lambda d: agreement(d[1]) - agreement(d[0]), reverse=True)
+    # data = sorted(data, key=lambda d: agreement(d[1]) - agreement(d[0]), reverse=True)
+    # data = sorted(data, key=lambda d: agreement(d[1]) + agreement(d[0]), reverse=False)
 
-    for datum1, datum2 in data[:16]:
+    import random
+
+    random.shuffle(data)
+
+    # data = [datum for datum in data if datum[0][0]["questionId"] == "201247133" or datum[0][0]["imageId"] in {"n119944", "n90294", "n146555", "n435808", "n222915"}] + data
+
+    for datum1, datum2 in data[:32]:
         elem = first(e for e in datum1 if e["lang"] == "en")
 
+        question_id = elem["questionId"]
         question = elem["question"]
         answer = elem["answer"]
+        image_id = elem["imageId"]
 
         lang_pred1 = [
             {"model": "en", "lang": elem["lang"], "pred": elem["prediction"]}
@@ -376,12 +385,29 @@ def show_qualitative_agreement_increase():
         df = pd.DataFrame(lang_pred1 + lang_pred2)
         df = df.pivot("lang", "model", "pred")
 
-        print(question)
-        print(answer)
-        print(df)
-        print()
+        st.code(question_id)
+        st.code(image_id)
+        st.image("../../xGQA/images/{}.jpg".format(image_id))
+        st.code(question)
+        st.code(answer)
+        df
+        str_latex = (
+            "\n".join(
+                [
+                    "\multicolumn{2}{c}{\includegraphics[height=3cm]{imgs/xgqa-images/"
+                    + image_id
+                    + ".jpg}}",
+                    "\multicolumn{2}{c}{" + question + "}",
+                    "\multicolumn{2}{c}{" + answer + "}",
+                ]
+            )
+            + "\n"
+            + "\n".join(df.to_latex().split("\n")[5: 13])
+        )
+        st.code(str_latex)
+        st.markdown("---")
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
 
 def main():
