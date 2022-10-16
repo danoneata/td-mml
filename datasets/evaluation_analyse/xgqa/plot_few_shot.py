@@ -64,7 +64,7 @@ def draw_avgs():
                                 "model": strategy_,
                                 "lang": lang,
                                 "type": type_,
-                                "learning": mode,
+                                "finetune": mode,
                                 "shots": x_id + 1,
                                 "accuracy": float(result_type[j]),
                             }
@@ -77,7 +77,7 @@ def draw_avgs():
                             "model": strategy_,
                             "lang": lang,
                             "type": type_,
-                            "learning": mode,
+                            "finetune": "few_shot" if mode == "zero_shot" else mode,
                             "shots": 0 if mode == "zero_shot" else None,
                             "accuracy": float(result_type[j]),
                         }
@@ -85,13 +85,19 @@ def draw_avgs():
 
     df = pd.DataFrame(data_frame)
     df = df[df["model"] != "random_lg"]
-    df = df.replace({"model": {"xuniter": "xUNITER", "vtlm": "TD-MML"}})
-    # df = df.groupby(["model", "concept", "learning", "shots"])["accuracy"].mean()
-    pdb.set_trace()
 
-    shot_learning = ["zero_shot", "few_shot"]
-    df1 = df[df["learning"].isin(shot_learning)]
+    def replicate_zero_shot(row):
+        if row.finetune == "translate_train":
+            row.shots = np.arange(0, 7)
+        return row
+
+    df1 = df.apply(replicate_zero_shot, axis=1).explode("shots", ignore_index=True)
     df1
+
+    df1 = df1.replace({
+        "model": {"xuniter": "xUNITER", "vtlm": "TD-MML"},
+        "finetune": {"few_shot": "zero & few shot", "translate_train": "translated data"},
+    })
 
     fig = sns.relplot(
         data=df1,
@@ -99,7 +105,7 @@ def draw_avgs():
         y="accuracy",
         col="type",
         hue="model",
-        style="model",
+        style="finetune",
         kind="line",
     )
     # sns.move_legend(fig, "lower right")
@@ -107,32 +113,10 @@ def draw_avgs():
     fig.set_xlabels("num. shots")
     fig.set_ylabels("accuracy (%)")
 
-    dff = df[df["learning"] == "translate_train"]
-    df1 = dff.groupby(["model", "type"])["accuracy"].mean()
-    df2 = dff.groupby(["model", "type"])["accuracy"].std()
-
-    # pdb.set_trace()
-    # fig.map(plt.hlines, np.array(df1.xs("vtlm").values))
     labels = ["0", "1", "5", "10", "20", "25", "48"]
-    colors = sns.color_palette()
+
     for i, ax in enumerate(fig.axes[0]):
-        m = df1.xs("xUNITER").iloc[i]
-        s = df2.xs("xUNITER").iloc[i]
-        c = colors[0]
-        ax.axhline(y=m, xmin=0, xmax=48, color=c)
-        ax.axhspan(m - s, m + s, xmin=0, xmax=48, facecolor=c, alpha=0.2)
-
-        m = df1.xs("TD-MML").iloc[i]
-        s = df2.xs("TD-MML").iloc[i]
-        c = colors[1]
-        ax.axhline(y=m, xmin=0, xmax=48, color=c, linestyle="--")
-        ax.axhspan(m - s, m + s, xmin=0, xmax=48, facecolor=c, alpha=0.2)
-
-        ax.set_xticks(list(range(len(labels))), labels)
-
-        if i == 0:
-            ax.annotate("MT", (5, m + 5))
-    # df1
+         ax.set_xticks(list(range(len(labels))), labels)
 
     fig.savefig("output/few-shot/xgqa-few-shot.pdf")
     st.pyplot(fig)
