@@ -97,6 +97,7 @@ def draw_avgs():
     df1 = df1.replace({
         "model": {"xuniter": "xUNITER", "vtlm": "TD-MML"},
         "finetune": {"few_shot": "zero & few shot", "translate_train": "translated data"},
+        "shots": dict(enumerate(["0", "1", "5", "10", "20", "25", "48"])),
     })
 
     fig = sns.relplot(
@@ -112,11 +113,6 @@ def draw_avgs():
 
     fig.set_xlabels("num. shots")
     fig.set_ylabels("accuracy (%)")
-
-    labels = ["0", "1", "5", "10", "20", "25", "48"]
-
-    for i, ax in enumerate(fig.axes[0]):
-         ax.set_xticks(list(range(len(labels))), labels)
 
     fig.savefig("output/few-shot/xgqa-few-shot.pdf")
     st.pyplot(fig)
