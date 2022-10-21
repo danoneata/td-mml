@@ -13,11 +13,12 @@ To set up the environment, please follow the instructions listed in the [VOLTA R
 
 ## Data
 
-[`datasets/`](datasets) contains the textual data for each dataset.
+The machine translated data corresponding to Conceptual Captions dataset can be downloaded from [here](https://sharing.speed.pub.ro/owncloud/remote.php/webdav/cc-translations-m2m-100-lg-iglue-languages-filtered.zip).
+The code to generate the translations is available in `volta/data/conceptual_captions`;
+see the corresponding [README](https://github.com/danoneata/td-mml/tree/main/volta/data/conceptual_captions#translate-captions).
 
-Check out its [README](datasets/README.md) for links to preprocessed data.
-
-Features extraction steps for each of dataset and backbone can be found under [`features_extraction/`](features_extraction). 
+The visual features are the same as those used in IGLUE;
+see the extraction steps for each of dataset and backbone under [`features_extraction/`](features_extraction).
 
 ## Models
 
@@ -25,7 +26,7 @@ The checkpoints of all the pretrained V&L models can be downloaded from [ERDA](h
 
 For more details on defining new models in VOLTA, see [`volta/MODELS.md`](volta/MODELS.md).
 
-Model configuration files are stored in [`volta/config/`](volta/config). 
+Model configuration files are stored in [`volta/config/`](volta/config).
 
 
 ## Training and Evaluation
@@ -41,7 +42,7 @@ Task configuration files are stored in [config_tasks/](config_tasks).
 
 ## License
 
-This work is licensed under the MIT license. See [`LICENSE`](LICENSE) for details. 
+This work is licensed under the MIT license. See [`LICENSE`](LICENSE) for details.
 Third-party software and data are subject to their respective licenses.
 
 If you find our code/data/models or ideas useful in your research, please consider citing the paper.
