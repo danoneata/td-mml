@@ -23,6 +23,10 @@ MODEL_TO_PATH = {
     "tt-mml-pretrain": "data/results-new/vtlm_20langs_xgqa_test_results/xGQA{lang}-vtlm-batch_size_256-step_100000-langs_20/pytorch_model_best.bin-/test_{lang}_result.json",
     "tt-mml-pretrain-epoch-1": "data/results-new/vtlm_20langs_xgqa_test_results/xGQA{lang}-vtlm-batch_size_256-step_100000-langs_20-val_epoch_0/pytorch_model_epoch_0_step_3683.bin-/test_{lang}_result.json",
     "tt-mml-pretrain-finetune": "data/results/preds_xGQA_multilingual_eval/ctrl_ttmml_vtlm_20langs/test/results/ctrl_xuniter_base/xGQA{lang}-vtlm-batch_size_256-step_100000-langs_20-eval_step_29468-filter/pytorch_model_epoch_0_step_29468.bin-/test_{lang}_result.json",
+    #
+    "tt-mml-pretrain-epoch-22-5": "data/zero_shot/ctrl_ttmml_vtlm_20langs/xgqa/results/xGQA{lang}-vtlm-batch_size_256-step_220000-langs_20/pytorch_model_best.bin-/test_{lang}_result.json",
+    "tt-mml-pretrain-epoch-22": "data/results_epoch22/zero_shot/ctrl_ttmml_vtlm_20langs/xgqa/results/xGQA{lang}-vtlm-batch_size_256-step_220000-langs_20-val_epoch_0/pytorch_model_epoch_0_step_3683.bin-/test_{lang}_result.json",
+    "tt-mml-pretrain-epoch-22-finetune": "data/results_epoch22/translate_train/ctrl_ttmml_vtlm_20langs/xgqa/results/ctrl_xuniter_base/xGQA{lang}-vtlm-batch_size_256-step_220000-langs_20-eval_step_29468-filter/pytorch_model_epoch_0_step_29468.bin-/test_{lang}_result.json",
 }
 
 
@@ -88,7 +92,9 @@ def agreement_across_languages():
     data = [
         merge(datum, {"is-correct": is_correct(datum), "lang": lang})
         for lang in languages
-        for datum in load_data("tt-mml-pretrain", lang)
+        for datum in load_data("tt-mml-pretrain-epoch-22-5", lang)
+        # for datum in load_data("tt-mml-pretrain-epoch-22-finetune", lang)
+        # for datum in load_data("tt-mml-pretrain", lang)
     ]
 
     df = pd.DataFrame(data)
@@ -119,7 +125,7 @@ def agreement_across_languages():
     mask[np.triu_indices_from(mask)] = True
 
     with sns.axes_style("white"):
-        fig, axs = plt.subplots(figsize=(7, 5))
+        fig, ax = plt.subplots(figsize=(7, 5))
         sns.heatmap(
             agreement,
             square=True,
@@ -129,7 +135,7 @@ def agreement_across_languages():
             yticklabels=languages,
             vmin=0.0,
             vmax=1.0,
-            ax=axs[0],
+            ax=ax,
         )
 
         "Cohen's Kappa score between pairs of langauages"
@@ -353,18 +359,32 @@ def show_qualitative_agreement_increase():
         data = sorted(data, key=by_question)
         return {k: list(group) for k, group in groupby(data, by_question)}
 
-    data1 = load_data_("tt-mml-pretrain")
-    data2 = load_data_("tt-mml-pretrain-finetune")
+    data1 = load_data_("tt-mml-pretrain-epoch-22-5")
+    data2 = load_data_("tt-mml-pretrain-epoch-22-finetune")
 
     data = [(data1[k], data2[k]) for k in data1.keys()]
-    # data = sorted(data, key=lambda d: agreement(d[1]) - agreement(d[0]), reverse=True)
+    data = sorted(data, key=lambda d: agreement(d[1]) - agreement(d[0]), reverse=True)
     # data = sorted(data, key=lambda d: agreement(d[1]) + agreement(d[0]), reverse=False)
 
-    import random
-
-    random.shuffle(data)
+    # import random
+    # random.shuffle(data)
 
     # data = [datum for datum in data if datum[0][0]["questionId"] == "201247133" or datum[0][0]["imageId"] in {"n119944", "n90294", "n146555", "n435808", "n222915"}] + data
+
+    # Selected images and questions in the paper...
+    SELECTED_IGMS = "n393305 n83784 n435808 n379991".split()[2:]
+    SELECTED_QS = [
+        "What is located on top of the pole?",
+        "Is the black and white cat unhappy or happy?",
+        "What is sitting next to the computer mouse?",
+        "Which kind of cooking utensil is flat?",
+    ]
+    data = [
+        datum
+        for datum in data
+        # if datum[0][0]["imageId"] in SELECTED_IGMS
+        # and any(datum[0][2]["question"].startswith(q) for q in SELECTED_QS)
+    ]
 
     for datum1, datum2 in data[:32]:
         elem = first(e for e in datum1 if e["lang"] == "en")
@@ -383,6 +403,20 @@ def show_qualitative_agreement_increase():
             for elem in datum2
         ]
         df = pd.DataFrame(lang_pred1 + lang_pred2)
+        df = df.replace(
+            {
+                "lang": {
+                    "bn": "BEN",
+                    "de": "DEU",
+                    "en": "ENG",
+                    "id": "IND",
+                    "ko": "KOR",
+                    "pt": "POR",
+                    "ru": "RUS",
+                    "zh": "CMN",
+                }
+            }
+        )
         df = df.pivot("lang", "model", "pred")
 
         st.code(question_id)
@@ -402,7 +436,7 @@ def show_qualitative_agreement_increase():
                 ]
             )
             + "\n"
-            + "\n".join(df.to_latex().split("\n")[5: 13])
+            + "\n".join(df.to_latex().split("\n")[5:13])
         )
         st.code(str_latex)
         st.markdown("---")
@@ -414,6 +448,7 @@ def main():
     # ensemble_results("tt-mml-pretrain")
     # ensemble_results("tt-mml-pretrain-finetune")
     show_qualitative_agreement_increase()
+    # agreement_across_languages()
 
 
 if __name__ == "__main__":
