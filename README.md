@@ -1,26 +1,23 @@
-# IGLUE: The Image-Grounded Language Understanding Evaluation Benchmark
+# TD-MML: Translated Data for Multilingual Multimodal Learning
 
-This is the implementation of the approaches described in the paper:
-> Emanuele Bugliarello, Fangyu Liu, Jonas Pfeiffer, Siva Reddy, Desmond Elliott, Edoardo Maria Ponti, Ivan Vulić. [IGLUE: A Benchmark for Transfer Learning across Modalities, Tasks, and Languages](https://arxiv.org/abs/2201.11732). arXiv 2022; abs/2201.11732.
+This repository contains the implementation for the paper:
 
-We provide the code for reproducing our results, preprocessed data and pretrained models.
+> Chen Qiu, Dan Oneață, Emanuele Bugliarello, Stella Frank, Desmond Elliott.
+> Multilingual Multimodal Learning with Machine Translated Text.
+> EMNLP, 2022.
 
-IGLUE models and tasks will also be integrated into [VOLTA](https://github.com/e-bug/volta), upon which our repository was origally built.
+## Setup
 
-
-## Repository Setup
-
-To set the environment to reproduce our results, see "Repository Setup" in the [VOLTA's README](volta/README.md).
-
+This repository is a fork of the [IGLUE](https://github.com/e-bug/iglue) codebase, which in turn depends on [VOLTA](https://github.com/e-bug/volta).
+To set up the environment, please follow the instructions listed in the [VOLTA README](https://github.com/e-bug/iglue/blob/main/volta/README.md).
 
 ## Data
 
 [`datasets/`](datasets) contains the textual data for each dataset.
 
-Check out its [README](datasets/README.md) for links to preprocessed data  
+Check out its [README](datasets/README.md) for links to preprocessed data.
 
 Features extraction steps for each of dataset and backbone can be found under [`features_extraction/`](features_extraction). 
-
 
 ## Models
 
@@ -42,24 +39,9 @@ We provide the scripts we used to train and evaluate models in [`experiments/`](
 
 Task configuration files are stored in [config_tasks/](config_tasks).
 
-
 ## License
 
 This work is licensed under the MIT license. See [`LICENSE`](LICENSE) for details. 
-Third-party software and data are subject to their respective licenses. <br>
-If you find our code/data/models or ideas useful in your research, please consider citing the paper:
-```
-@article{bugliarello-etal-2022-iglue,
-    title = "{IGLUE}: {A} Benchmark for Transfer Learning across Modalities, Tasks, and Languages",
-    author="Bugliarello, Emanuele and 
-        Liu, Fangyu and 
-        Pfeiffer, Jonas and 
-        Reddy, Siva and 
-        Elliott, Desmond and 
-        Ponti, Edoardo Maria and 
-        Vuli{\'c}, Ivan",
-    journal = "arXiv preprint arXiv:2201.11732"
-    year = "2022",
-    url = "https://arxiv.org/abs/2201.11732",
-}
-```
+Third-party software and data are subject to their respective licenses.
+
+If you find our code/data/models or ideas useful in your research, please consider citing the paper.
