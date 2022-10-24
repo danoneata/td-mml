@@ -24,7 +24,7 @@ We also provide translations for two of the IGLUE tasks in two variants (filtere
 - xGQA (based on the GQA dataset): [filtered translations](https://sharing.speed.pub.ro/owncloud/index.php/s/NowXwNATWMApQRu) · [full translations](https://sharing.speed.pub.ro/owncloud/index.php/s/fHHiNOhdI1IMqi1)
 
 The code to generate the translations is available in `volta/data/conceptual_captions`;
-see the corresponding [README](https://github.com/danoneata/td-mml/tree/main/volta/data/conceptual_captions#translate-captions).
+see the corresponding [README](https://github.com/danoneata/td-mml/tree/main/volta/data/conceptual_captions#translate-all-captions-in-the-iglue-languages-using-the-large-m2m-translation-model).
 
 The visual features are the same as those used in IGLUE;
 see the extraction steps for each of dataset and backbone under [`features_extraction/`](features_extraction).
