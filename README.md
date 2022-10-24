@@ -6,6 +6,8 @@ This repository contains the implementation for the paper:
 > _Multilingual Multimodal Learning with Machine Translated Text._
 > EMNLP, 2022.
 
+The paper will be soon available on arXiv.
+
 ## Setup
 
 This repository is a fork of the [IGLUE](https://github.com/e-bug/iglue) codebase, which in turn depends on [VOLTA](https://github.com/e-bug/volta).
