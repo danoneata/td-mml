@@ -77,7 +77,10 @@ conceptual_captions/
 
 ```
 
-## Translate Captions
+---
+
+## Translate a subset of the captions
+
 Translate the English CC captions into a target language using the M2M-100 translation model:
 ```bash
 python translate_cc.py -s train -m m2m-100-md -l ro
