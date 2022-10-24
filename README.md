@@ -13,9 +13,13 @@ To set up the environment, please follow the instructions listed in the [VOLTA R
 
 ## Data
 
-The machine translated data corresponding to Conceptual Captions dataset can be downloaded from [here](https://sharing.speed.pub.ro/owncloud/remote.php/webdav/cc-translations-m2m-100-lg-iglue-languages-filtered.zip).
+The machine translated data corresponding to the Conceptual Captions dataset can be downloaded from [here](https://sharing.speed.pub.ro/owncloud/remote.php/webdav/cc-translations-m2m-100-lg-iglue-languages-filtered.zip).
+The Conceptual Captions datasets contains 2.77M English sentences gathered from web-crawled alt-text and post-processed to remove proper names.
+We translated those sentences using the large M2M-100 model (with 1.2B parameters) into the twenty languages of the IGLUE benchmark.
+Since we have observed that the quality translations varies across languages, we have applied an automatic filtering procedure to discard poor sentences (see the paper for more details);
+the provided data contains the filtered translations.
 
-We also provide two variants of translations (filtered and full) for two of the IGLUE tasks:
+We also provide translations for two of the IGLUE tasks in two variants (filtered and full):
 - MaRVL (based on the NLVR2 dataset): [filtered translations](https://sharing.speed.pub.ro/owncloud/index.php/s/2J4mLWncB1lEbGc) · [full translations](https://sharing.speed.pub.ro/owncloud/index.php/s/Ge2qATV3LLA7yME)
 - xGQA (based on the GQA dataset): [filtered translations](https://sharing.speed.pub.ro/owncloud/index.php/s/NowXwNATWMApQRu) · [full translations](https://sharing.speed.pub.ro/owncloud/index.php/s/fHHiNOhdI1IMqi1)
 
