@@ -3,7 +3,7 @@
 This repository contains the implementation for the paper:
 
 > Chen Qiu, Dan Oneață, Emanuele Bugliarello, Stella Frank, Desmond Elliott.
-> Multilingual Multimodal Learning with Machine Translated Text.
+> _Multilingual Multimodal Learning with Machine Translated Text._
 > EMNLP, 2022.
 
 ## Setup
@@ -14,6 +14,11 @@ To set up the environment, please follow the instructions listed in the [VOLTA R
 ## Data
 
 The machine translated data corresponding to Conceptual Captions dataset can be downloaded from [here](https://sharing.speed.pub.ro/owncloud/remote.php/webdav/cc-translations-m2m-100-lg-iglue-languages-filtered.zip).
+
+We also provide two variants of translations (filtered and full) for two of the IGLUE tasks:
+- MaRVL (based on the NLVR2 dataset): [filtered translations](https://sharing.speed.pub.ro/owncloud/index.php/s/2J4mLWncB1lEbGc) · [full translations](https://sharing.speed.pub.ro/owncloud/index.php/s/Ge2qATV3LLA7yME)
+- xGQA (based on the GQA dataset): [filtered translations](https://sharing.speed.pub.ro/owncloud/index.php/s/NowXwNATWMApQRu) · [full translations](https://sharing.speed.pub.ro/owncloud/index.php/s/fHHiNOhdI1IMqi1)
+
 The code to generate the translations is available in `volta/data/conceptual_captions`;
 see the corresponding [README](https://github.com/danoneata/td-mml/tree/main/volta/data/conceptual_captions#translate-captions).
 
@@ -22,21 +27,17 @@ see the extraction steps for each of dataset and backbone under [`features_extra
 
 ## Models
 
-The checkpoints of all the pretrained V&L models can be downloaded from [ERDA](https://sid.erda.dk/sharelink/b1Rge0DwwW).
+The checkpoints of all the pretrained TD-MML model will be made available shortly.
 
 For more details on defining new models in VOLTA, see [`volta/MODELS.md`](volta/MODELS.md).
 
 Model configuration files are stored in [`volta/config/`](volta/config).
-
 
 ## Training and Evaluation
 
 We provide the scripts we used to train and evaluate models in [`experiments/`](experiments):
 - [`zero_shot/`](experiments/zero_shot): English fine-tuning and zero-shot/`translate test' evaluation
 - [`few_shot/`](experiments/few_shot): Few-shot experiments for each dataset-language-shots triplet
-- [`few_shot.dev-mt/`](experiments/few_shot.dev-mt): Few-shot experiments when using dev sets in the target languages (MT)
-- [`translate_train.de/`](experiments/translate_train.de): `Translate train' experiments on xFLickr&CO in German
-- [`translate_train.ja/`](experiments/translate_train.ja): `Translate train' experiments on xFLickr&CO in Japanese
 
 Task configuration files are stored in [config_tasks/](config_tasks).
 
