@@ -6,7 +6,7 @@ This repository contains the implementation for the paper:
 > _Multilingual Multimodal Learning with Machine Translated Text._
 > EMNLP, 2022.
 
-The paper will be soon available on arXiv.
+The paper is available on arXiv at the following [link](https://arxiv.org/abs/2210.13134).
 
 ## Setup
 
